@@ -1,0 +1,150 @@
+import os
+import re
+from elasticsearch import Elasticsearch
+import csv
+
+class ESCreate_Index:
+    def __init__(self, index_name):
+        # 连接elasticsearch,默认是9200
+        self.es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
+        self.index_name = index_name
+
+    # 创建索引
+    def create_index(self):
+        # 检查索引是否存在-不存在创建索引
+        if not self.es.indices.exists(index=self.index_name):
+            print("索引不存在")
+        else:
+            # 删除索引
+            print("索引已存在")
+            self.delete_index()
+        self.es.indices.create(index=self.index_name)
+        print("创建成功")
+
+    # 删除索引
+    def delete_index(self):
+        if self.es.indices.exists(index=self.index_name):
+            self.es.indices.delete(index=self.index_name)
+            print("删除成功")
+        else:
+            print("索引不存在")
+
+    # 插入数据
+    def insert_data(self, path):
+        # 读取文件夹
+        for root, dirs, files in os.walk(path):
+            print(root, dirs, files)
+            for file in files:
+                # 只读取txt文件
+                if file.endswith(".txt"):
+                    # 获取文件完整路径
+                    file_path = os.path.join(root, file)
+                    # 读取文件内容
+                    with open(file_path, "r", encoding='utf-8') as f:
+                        data = f.read()
+                        # 正则表达式子找到文档标题和内容这个正则表达式的作用是将输入的数据分割成两个部分：第一行作为标题，剩下的所有内容作为内容。
+                        match = re.search(r'^(.+?)\n(.+)$', data, re.S)
+                        # 如果为空就跳过
+                        if match is not None:
+                            title, content = match.groups()
+                        else:
+                            print("No match found in data: ", data)
+                            continue
+
+                        # 分割文件名和扩展名，然后添加新的扩展名
+                        base, ext = os.path.splitext(os.path.basename(file_path))
+                        url = base + ".html"
+
+                        # 创建文档
+                        self.es.index(index=self.index_name, body={
+                            "title": title,
+                            "from": url,
+                            "content": content,
+                        })
+                        print("插入成功数据", url)
+    def update_data(self, file_path):
+        # 加载 URL 映射字典
+        url_mapping = self.load_url_mapping(file_path)
+
+        # 遍历字典，并使用 Elasticsearch 更新 API 更新数据
+        for from_value, url in url_mapping.items():
+            body = {
+                "script": {
+                    "source": "ctx._source.from = params.url",
+                    "lang": "painless",
+                    "params": {"url": url}
+                },
+                "query": {
+                    "match": {
+                        "from": from_value
+                    }
+                }
+            }
+            self.es.update_by_query(index=self.index_name, body=body)
+            print(f"更新数据 {from_value} 成功")
+
+    def load_url_mapping(self, file_path):
+        url_mapping = {}
+        with open(file_path, 'r', encoding='utf-8') as f:
+            csv_reader = csv.reader(f)
+            next(csv_reader)  # 跳过表头
+            for row in csv_reader:
+                url_mapping[row[0]] = row[1]
+        return url_mapping
+
+    # 标题查询
+    def title_search(self, query, page=1, page_size=10):
+        from_ = (page - 1) * page_size
+        body = {
+            "query": {
+                "match": {
+                    "title": query
+                }
+            },
+            "highlight": {  # 添加高亮字段
+                "fields": {
+                    "title": {}
+                }
+            },
+            "from": from_,  # 指定开始位置
+            "size": page_size  # 指定返回结果的数量
+        }
+        print(body)
+        response = self.es.search(index=self.index_name, body=body)
+        return response
+
+
+    # 内容查询
+    def content_search(self, query):
+        body = {
+            "query": {
+                "match": {
+                    "content": query
+                }
+            },
+            "highlight": {  # 添加高亮字段
+                "fields": {
+                    "content": {}
+                }
+            }
+        }
+        response = self.es.search(index=self.index_name, body=body)
+        return response
+
+
+if __name__ == "__main__":
+    ESCreate_Index = ESCreate_Index("news")
+    ESCreate_Index.create_index()
+    ESCreate_Index.insert_data("static/data/txt/Chinese")
+    ESCreate_Index.insert_data("static/data/txt/English")
+    # print(ESCreate_Index.title_search("苹果"))
+    # print(ESCreate_Index.content_search("苹果"))
+    # 加载 'urls.csv' 文件并更新数据
+    ESCreate_Index.update_data('static/data/urls.csv')
+
+请以上面的为蓝本，帮我达到我想要的功能，首先我要创建一个新的索引，名字叫patent，数据在neo4j/data/index/实体-专利.csv中格式如下：
+申请号,公开号,申请日,公开日,文献类型,名称,摘要
+CN200810045361.2,CN101225743A,2008.02.04,2008.07.23,发明,一种地震区隧道减震结构的建造方法,一种地震区隧道减震结构的建造方法，其做法是：在隧道洞口段的围岩及初期支护(1)表面先铺设一层弹性材料构成的减震层(2)，该减震层(2)的纵向长度为15－50米，然后，再在减震层的外面修建二次衬砌(3)。该方法建造的隧道结构，其减震效果好，能有效地避免地震对隧道造成的损坏，且施工简单，成本低。
+CN201520923104.X,CN205106095U,2015.11.19,2016.03.30,实用新型,一种胚芽饵料红外线隧道炒制机,本实用新型提供一种胚芽饵料红外线隧道炒制机，由保温箱体、加料口、平铺输送带、翻转式履带、高温托辊、红外线加热器、倒料口、水蒸气处理器、温度检测仪、冷却器、驱动装置、出料口、刮板器组成；加料口、冷却器、出料口设置在保温箱体上，温度检测仪在保温箱体内，水蒸气处理器连通保温箱体，高温托辊、红外线加热器安装在平铺输送带、翻转式履带下方；本实用新型具有经济智能、节源高效、清洁卫生、保证饵料品质均匀等优点。
+CN201010232585.1,CN101899984A,2010.07.21,2010.12.01,发明,一种用于膨胀岩土地区的盾构隧道管片的弹性纵缝装置,一种用于膨胀岩土地区的盾构隧道管片的弹性纵缝装置，其管片的纵缝壁上设置有覆盖全纵缝壁的橡胶带，在密封槽处的橡胶带位于密封槽壁和密封垫之间，橡胶带的厚度P由公式确定；式中，P′为在衬砌结构轴力的作用下橡胶带被压缩后的厚度，为3-8mm；E2-橡胶带弹性模量；N-衬砌结构所受到的轴力；A-轴力作用面积，A＝bh，b为管片纵缝的长度，h为管片的厚度。该装置能大幅度降低衬砌的等效刚度，从而减小作用在衬砌上的膨胀力，以保证在膨胀岩土地区修建的盾构隧道结构的安全、可靠；同时它也降低衬砌结构的内应力，可有效减少衬砌的配筋量；并且其防水性能好。
+插入数据时也请以这样的格式插入

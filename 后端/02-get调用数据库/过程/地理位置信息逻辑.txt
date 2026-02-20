@@ -1,0 +1,579 @@
+实体结点属性一栏
+
+> ├── Patent # 专利
+> │   ├── 公开号
+> │   ├── 公开日
+> │   ├── 名称
+> │   ├──摘要
+> │   ├──文献类型
+> │   ├──申请号
+> │   └── 申请日
+> ├── Agent # 代理机构
+> │   └── 名称
+> ├── Inventor # 发明人
+> │   └── 名称
+> ├── IPC # IPC分类号
+> │   └── 名称
+> ├── Applicant # 申请人
+> │   ├── 名称
+> │   ├── province
+> │   └── 邮编
+
+结点关系一栏
+
+> (Patent )-[CITES_BY]->(Patent ) #专利被专利引用
+>
+> (Patent )-[APPLIED_BY]->(Applicant ) #专利被申请人申请
+>
+> (Patent )-[BELONGS_TO]->(IPC ) #专利属于该IPC分类号
+>
+> (Patent )-[INVENTED_BY]->(Inventor ) #专利被发明人发明
+>
+> (Patent )-[REPRESENTED_BY]->(Agent ) #专利被代理人申请
+以上是我专利知识图谱的实体结点属性和实体结点之间的关系
+我用的neo4j数据库是5.2.0
+现在我希望在我的类Neo4jQuery中写一个函数去查询专利的地理位置信息
+class Neo4jQuery:
+
+    def __init__(self, url, user, password):
+        self.graph = Graph(url, user=user, password=password, name="neo4j")
+函数名和属性规定如下
+    # 查询专利某个时间结点前的专利的地理信息
+    def location_patent_search(self, time):
+希望的返回格式如下
+ result_template = {
+            '北京': 0,
+            '天津': 0,
+            '上海': 0,
+            '重庆': 0,
+            '河北': 0,
+            '河南': 0,
+            '云南': 0,
+            '辽宁': 0,
+            '黑龙江': 0,
+            '湖南': 0,
+            '安徽': 0,
+            '山东': 0,
+            '新疆': 0,
+            '江苏': 0,
+            '浙江': 0,
+            '江西': 0,
+            '湖北': 0,
+            '广西': 0,
+            '甘肃': 0,
+            '山西': 0,
+            '内蒙古': 0,
+            '陕西': 0,
+            '吉林': 0,
+            '福建': 0,
+            '贵州': 0,
+            '广东': 0,
+            '青海': 0,
+            '西藏': 0,
+            '四川': 0,
+            '宁夏': 0,
+            '海南': 0,
+            '台湾': 0,
+            '香港': 0,
+            '澳门': 0
+        }
+请注意因为专利自身不带省份的属性，而是通过关系(Patent )-[APPLIED_BY]->(Applicant ) #专利被申请人申请
+找到其Applicant的province属性，来确定专利的地理位置，另外时间是通过Patent的公开日属性确定的，格式是YYYY.MM.DD，
+请根据上面的信息帮我写出location_patent_search函数和其测试代码
+
+非常好，现在同时每个Patent都有一个重要度的属性pageRankScore，我希望在结合这个在刚刚def location_patent_search(self, time)的基础上添加一个返回值
+是每个省份专利的总pageRankScore值，数据格式可以这样：
+{
+    "专利数量": [
+        {
+            "name": "北京",
+            "value": 0
+        },
+        {
+            "name": "天津",
+            "value": 0
+        },
+        {
+            "name": "上海",
+            "value": 0
+        },
+        {
+            "name": "重庆",
+            "value": 0
+        },
+        {
+            "name": "河北",
+            "value": 8
+        },
+        {
+            "name": "河南",
+            "value": 6
+        },
+        {
+            "name": "云南",
+            "value": 1
+        },
+        {
+            "name": "辽宁",
+            "value": 5
+        },
+        {
+            "name": "黑龙江",
+            "value": 1
+        },
+        {
+            "name": "湖南",
+            "value": 10
+        },
+        {
+            "name": "安徽",
+            "value": 13
+        },
+        {
+            "name": "山东",
+            "value": 10
+        },
+        {
+            "name": "新疆",
+            "value": 0
+        },
+        {
+            "name": "江苏",
+            "value": 45
+        },
+        {
+            "name": "浙江",
+            "value": 33
+        },
+        {
+            "name": "江西",
+            "value": 16
+        },
+        {
+            "name": "湖北",
+            "value": 5
+        },
+        {
+            "name": "广西",
+            "value": 0
+        },
+        {
+            "name": "甘肃",
+            "value": 2
+        },
+        {
+            "name": "山西",
+            "value": 0
+        },
+        {
+            "name": "内蒙古",
+            "value": 1
+        },
+        {
+            "name": "陕西",
+            "value": 2
+        },
+        {
+            "name": "吉林",
+            "value": 2
+        },
+        {
+            "name": "福建",
+            "value": 14
+        },
+        {
+            "name": "贵州",
+            "value": 9
+        },
+        {
+            "name": "广东",
+            "value": 95
+        },
+        {
+            "name": "青海",
+            "value": 3
+        },
+        {
+            "name": "西藏",
+            "value": 1
+        },
+        {
+            "name": "四川",
+            "value": 19
+        },
+        {
+            "name": "宁夏",
+            "value": 0
+        },
+        {
+            "name": "海南",
+            "value": 0
+        },
+        {
+            "name": "台湾",
+            "value": 0
+        },
+        {
+            "name": "香港",
+            "value": 0
+        },
+        {
+            "name": "澳门",
+            "value": 0
+        }
+    ],
+    "专利重要度": [
+        {
+            "name": "北京",
+            "value": 0
+        },
+        {
+            "name": "天津",
+            "value": 0
+        },
+        {
+            "name": "上海",
+            "value": 0
+        },
+        {
+            "name": "重庆",
+            "value": 0
+        },
+        {
+            "name": "河北",
+            "value": 1784443.38
+        },
+        {
+            "name": "河南",
+            "value": 407414.35
+        },
+        {
+            "name": "云南",
+            "value": 89241.17
+        },
+        {
+            "name": "辽宁",
+            "value": 201680.06
+        },
+        {
+            "name": "黑龙江",
+            "value": 191566.45
+        },
+        {
+            "name": "湖南",
+            "value": 1102024.32
+        },
+        {
+            "name": "安徽",
+            "value": 1978755.52
+        },
+        {
+            "name": "山东",
+            "value": 645325.98
+        },
+        {
+            "name": "新疆",
+            "value": 0
+        },
+        {
+            "name": "江苏",
+            "value": 4918840.949999999
+        },
+        {
+            "name": "浙江",
+            "value": 3156830.05
+        },
+        {
+            "name": "江西",
+            "value": 2293964.9699999997
+        },
+        {
+            "name": "湖北",
+            "value": 292415.44
+        },
+        {
+            "name": "广西",
+            "value": 0
+        },
+        {
+            "name": "甘肃",
+            "value": 1121074.49
+        },
+        {
+            "name": "山西",
+            "value": 0
+        },
+        {
+            "name": "内蒙古",
+            "value": 113277.76
+        },
+        {
+            "name": "陕西",
+            "value": 885118.28
+        },
+        {
+            "name": "吉林",
+            "value": 165724.78
+        },
+        {
+            "name": "福建",
+            "value": 1726812.6
+        },
+        {
+            "name": "贵州",
+            "value": 464784.06
+        },
+        {
+            "name": "广东",
+            "value": 8816665.41
+        },
+        {
+            "name": "青海",
+            "value": 987158.2100000001
+        },
+        {
+            "name": "西藏",
+            "value": 52117.12
+        },
+        {
+            "name": "四川",
+            "value": 2929980.83
+        },
+        {
+            "name": "宁夏",
+            "value": 0
+        },
+        {
+            "name": "海南",
+            "value": 0
+        },
+        {
+            "name": "台湾",
+            "value": 0
+        },
+        {
+            "name": "香港",
+            "value": 0
+        },
+        {
+            "name": "澳门",
+            "value": 0
+        }
+    ]
+}
+
+非常好我已经在neo4j/export_data.py的Neo4jQuery类中添加了查询地理信息的代码，现在我想在app.py中去添加一个接口要怎么做
+我希望的接口如下：
+接口url:http://127.0.3.1:5050/datas/location?time=2023-4-10
+
+功能说明:输入当前要查询的时间结点，返回这个时间结点专利的数量分布情况和重要度分布情况
+
+输出实例:
+> >{
+> >"message": "数据查询成功",
+> >"results": {
+> >"专利数量": [...
+> >],
+> >"重要度": [
+> >...
+> >]
+> >},
+> >"status": "success"
+> >}
+以下是我app.py中的一些代码：
+from flask import Flask, request, jsonify
+from flask.views import MethodView
+from flask_cors import CORS
+from neo4j.export_data import Neo4jQuery  # 确保导入正确
+
+app = Flask(__name__)
+CORS(app)  # 简化跨域处理初始化
+
+# 数据库的基础配置（这部分看起来是你用到的，保留下来了）
+url = 'http://localhost:7474/browser/'
+user = 'neo4j'
+password = 'CHW123d456'
+
+
+# 首页请求处理
+@app.route('/')
+def hello_world():
+    return 'Hello World!'
+
+
+
+现在请帮我写一个函数
+以下是我数据库的信息
+实体结点属性一栏
+
+> ├── Patent # 专利
+> │   ├── 公开号
+> │   ├── 公开日
+> │   ├── 名称
+> │   ├──摘要
+> │   ├──文献类型
+> │   ├──申请号
+> │   └── 申请日
+> ├── Agent # 代理机构
+> │   └── 名称
+> ├── Inventor # 发明人
+> │   └── 名称
+> ├── IPC # IPC分类号
+> │   └── 名称
+> ├── Applicant # 申请人
+> │   ├── 名称
+> │   ├── province
+> │   └── 邮编
+
+结点关系一栏
+
+> (Patent )-[CITES_BY]->(Patent ) #专利被专利引用
+>
+> (Patent )-[APPLIED_BY]->(Applicant ) #专利被申请人申请
+>
+> (Patent )-[BELONGS_TO]->(IPC ) #专利属于该IPC分类号
+>
+> (Patent )-[INVENTED_BY]->(Inventor ) #专利被发明人发明
+>
+> (Patent )-[REPRESENTED_BY]->(Agent ) #专利被代理人申请
+我用的neo4j数据库是5.2.0
+现在我希望在我的类Neo4jQuery中写一个函数去查询专利的地理位置信息
+class Neo4jQuery:
+
+    def __init__(self, url, user, password):
+        self.graph = Graph(url, user=user, password=password, name="neo4j")
+函数名和属性规定如下
+def location_IPC_search(self, time):
+- **查询某个时间结点各个省份IPC占比**
+
+- 功能：查找匹配各个省份专利的IPC列表。
+
+- 参数：查询日期(YYYY-MM-DD)
+
+- 返回值：搜索的结果列表，各个省份的IPC占比列表
+
+  >{
+  >
+  >'北京': [
+  >
+  >{'name': 'E21D11/00', 'value': 567},
+  >
+  >{'name': 'A23L5/10', 'value': 123},
+  >
+  >{'name': 'A23N17/00', 'value': 259},
+  >
+  >{'name': 'A01K97/04', 'value': 155},
+  >
+  >...
+  >
+  >],
+  >
+  >'天津': [
+  >
+  >{'name': 'E21D11/00', 'value': 7},
+  >
+  >{'name': 'A23L5/10', 'value': 12},
+  >
+  >{'name': 'A23N17/00', 'value': 9},
+  >
+  >],
+  >
+  >'上海': [
+  >
+  >{'name': 'E21D11/00', 'value': 5},
+  >
+  >{'name': 'A23L5/10', 'value': 3},
+  >
+  >{'name': 'A23N17/00', 'value': 59},
+  >
+  >],
+  >
+  >...
+  >
+  >}
+要查的省份名单如下：
+  provinces = [
+            '北京', '天津', '上海', '重庆', '河北', '河南', '云南', '辽宁', '黑龙江',
+            '湖南', '安徽', '山东', '新疆', '江苏', '浙江', '江西', '湖北', '广西', '甘肃',
+            '山西', '内蒙古', '陕西', '吉林', '福建', '贵州', '广东', '青海', '西藏', '四川',
+            '宁夏', '海南', '台湾', '香港', '澳门'
+        ]
+
+- 实现思路：遍历所有Patent结点筛选出Patent公开日(注意公开日的格式是YYYY.MM.DD)小于时间结点的，通过关系(Patent )-[APPLIED_BY]->(Applicant )
+找到专利的申请人在通过申请人的province属性，确定专利所属的地区，还有(Patent )-[BELONGS_TO]->(IPC ) 通过IPC的名称属性找到专利所属的IPC。
+
+现在在neo4j/export_data.py我有了
+location_IPC_search
+location_patent_importance_search
+location_inventor_importance_search
+location_applicant_importance_search
+我要在app.py中添加一个接口去返回这些数据
+放回格式希望如下：
+{
+    "status": "success",
+    "message": "数据查询成功",
+    "results":{
+    "ipc":{location_IPC_search的结果}
+    "patent":{location_patent_importance_search}
+    "inventor":{location_inventor_importance_search的结果}
+    "applicant":{location_applicant_importance_search的结果}
+    }
+}
+from flask import Flask, request, jsonify
+from flask.views import MethodView
+from flask_cors import CORS
+from neo4j.export_data import Neo4jQuery  # 确保导入正确
+from datetime import datetime
+
+app = Flask(__name__)
+CORS(app)  # 简化跨域处理初始化
+
+# 数据库的基础配置（这部分看起来是你用到的，保留下来了）
+url = 'http://localhost:7474/browser/'
+user = 'neo4j'
+password = 'CHW123d456'
+
+
+# 首页请求处理
+@app.route('/')
+def hello_world():
+    return 'Hello World!'
+
+# 获取专利地理信息的接口
+@app.route('/datas/location', methods=['GET'])
+def location_data():
+    time = request.args.get('time')
+    if not time:
+        return jsonify({
+            "message": "时间参数缺失",
+            "status": "error"
+        }), 400
+
+    try:
+        # 首先尝试 YYYY-MM-DD 格式
+        parsed_time = datetime.strptime(time, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({
+            "message": f"时间格式错误，无法解析: {time}",
+            "status": "error"
+        }), 400
+
+    # 将日期转换为 YYYY.MM.DD 格式
+    formatted_time = parsed_time.strftime('%Y.%m.%d')
+
+    # 创建Neo4jQuery实例
+    # 确保 Neo4jQuery 和其方法 location_patent_search 已定义并可用
+    query_instance = Neo4jQuery('bolt://localhost:7687', user, password)
+
+    try:
+        results = query_instance.location_patent_search(formatted_time)
+        return jsonify({
+            "message": "数据查询成功",
+            "results": results,
+            "status": "success"
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "message": f"查询过程中发生错误: {str(e)}",
+            "status": "error"
+        }), 500

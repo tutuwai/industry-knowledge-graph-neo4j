@@ -1,0 +1,481 @@
+{
+  "产品": [],
+  "产品与产品": [],
+  "公司": [
+    {
+      "city": "重庆市",
+      "code": "834033.BJ",
+      "communityId": 0,
+      "down": 0,
+      "fullname": "重庆康普化学工业股份有限公司",
+      "id": 0,
+      "mid": 0,
+      "name": "康普化学",
+      "pagerank": 0.15000000000000002,
+      "pagerank_raw": 0.15,
+      "pagerank_sqrt": 0.387,
+      "up": 0,
+      "上市地点": "北京证券交易所",
+      "上市首日开盘价": "17.13",
+      "主营业务": "铜萃取剂、新能源电池金属萃取剂以及其他特种表面活性剂的研发、生产和销售",
+    },
+    {
+      "city": "重庆市",
+      "code": "603717.SH",
+      "communityId": 1,
+      "down": 0,
+      "fullname": "天域生态环境股份有限公司",
+      "id": 1,
+      "mid": 0,
+      "name": "天域生态",
+      "pagerank": 0.15000000000000002,
+      "pagerank_raw": 0.15,
+      "pagerank_sqrt": 0.387,
+      "up": 0,
+      "上市地点": "上海证券交易所",
+      "上市首日开盘价": "17.56",
+      "主营业务": "生态环境业务（园林生态工程、生态环境治理、田园综合体、苗木种植等）、生态农牧业务（生猪养殖、农产品销售）和新设的光伏新能源业务。",
+    }
+  ],
+  "公司与产品": [],
+  "公司与供应商": [
+    {
+      "from": "长安汽车",
+      "id_from": 4,
+      "id_to": 57,
+      "rel": "供应商",
+      "to": "骆驼股份",
+      "公开时间": "2014-08",
+      "数据来源": "供应商公告",
+      "采购占比": "-",
+      "采购金额万元": "5136.19"
+    },
+    {
+      "from": "长安汽车",
+      "id_from": 4,
+      "id_to": 24,
+      "rel": "供应商",
+      "to": "成飞集成",
+      "公开时间": "2018-01",
+      "数据来源": "供应商公告",
+      "采购占比": "-",
+      "采购金额万元": "-"
+    }
+  ],
+  "公司与新闻": [],
+  "新闻": [],
+  "环节": [
+    {
+      "communityId": 400,
+      "down": 0,
+      "id": 320,
+      "mid": 0,
+      "name": "上游（原材料）",
+      "pagerank": 2.5666640566809797,
+      "pagerank_raw": 2.567,
+      "pagerank_sqrt": 1.602,
+      "type": "link",
+      "up": 1
+    },
+
+    {
+      "communityId": 3556,
+      "down": 0,
+      "id": 373,
+      "mid": 0,
+      "name": "叠片机",
+      "pagerank": 1.3785884390538856,
+      "pagerank_raw": 1.379,
+      "pagerank_sqrt": 1.174,
+      "type": "link",
+      "up": 1
+    },
+    {
+      "communityId": 3556,
+      "down": 0,
+      "id": 374,
+      "mid": 0,
+      "name": "注液机",
+      "pagerank": 2.0226674589002003,
+      "pagerank_raw": 2.023,
+      "pagerank_sqrt": 1.422,
+      "type": "link",
+      "up": 1
+    },
+    {
+      "communityId": 3556,
+      "down": 0,
+      "id": 375,
+      "mid": 0,
+      "name": "混合设备",
+      "pagerank": 1.0734414430473476,
+      "pagerank_raw": 1.073,
+      "pagerank_sqrt": 1.036,
+      "type": "link",
+      "up": 1
+    },
+    {
+      "communityId": 3556,
+      "down": 0,
+      "id": 376,
+      "mid": 0,
+      "name": "干燥设备",
+      "pagerank": 0.5114890486726377,
+      "pagerank_raw": 0.511,
+      "pagerank_sqrt": 0.715,
+      "type": "link",
+      "up": 1
+    },
+    {
+      "communityId": 3556,
+      "down": 0,
+      "id": 377,
+      "mid": 0,
+      "name": "锂电装配设备（系统）",
+      "pagerank": 0.33754817648908847,
+      "pagerank_raw": 0.338,
+      "pagerank_sqrt": 0.581,
+      "type": "link",
+      "up": 1
+    },
+    {
+      "communityId": 3556,
+      "down": 0,
+      "id": 378,
+      "mid": 0,
+      "name": "锂电化成及检测设备（系统）",
+      "pagerank": 2.1625466813845367,
+      "pagerank_raw": 2.163,
+      "pagerank_sqrt": 1.471,
+      "type": "link",
+      "up": 1
+    },
+    {
+      "communityId": 3556,
+      "down": 0,
+      "id": 379,
+      "mid": 0,
+      "name": "锂电自动化成套设备（系统）",
+      "pagerank": 1.3095368484917307,
+      "pagerank_raw": 1.31,
+      "pagerank_sqrt": 1.145,
+      "type": "link",
+      "up": 1
+    },
+    {
+      "communityId": 396,
+      "down": 0,
+      "id": 380,
+      "mid": 1,
+      "name": "中游（四大材料+设备）",
+      "pagerank": 1.579050282936141,
+      "pagerank_raw": 1.579,
+      "pagerank_sqrt": 1.257,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 0,
+      "id": 381,
+      "mid": 1,
+      "name": "锂电池模组及PACK",
+      "pagerank": 1.1506813707416823,
+      "pagerank_raw": 1.151,
+      "pagerank_sqrt": 1.073,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 0,
+      "id": 382,
+      "mid": 1,
+      "name": "锂电芯组成",
+      "pagerank": 1.4790168204319039,
+      "pagerank_raw": 1.479,
+      "pagerank_sqrt": 1.216,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 0,
+      "id": 383,
+      "mid": 1,
+      "name": "锂电池隔膜",
+      "pagerank": 4.032438336218532,
+      "pagerank_raw": 4.032,
+      "pagerank_sqrt": 2.008,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 96,
+      "down": 0,
+      "id": 384,
+      "mid": 1,
+      "name": "锂电池电解液",
+      "pagerank": 4.57186294623645,
+      "pagerank_raw": 4.572,
+      "pagerank_sqrt": 2.138,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 105,
+      "down": 0,
+      "id": 385,
+      "mid": 1,
+      "name": "锂电池正极",
+      "pagerank": 3.8196984504810314,
+      "pagerank_raw": 3.82,
+      "pagerank_sqrt": 1.954,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 326,
+      "down": 0,
+      "id": 386,
+      "mid": 1,
+      "name": "锂电池负极",
+      "pagerank": 4.814573129285513,
+      "pagerank_raw": 4.815,
+      "pagerank_sqrt": 2.194,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 0,
+      "id": 387,
+      "mid": 1,
+      "name": "电池管理系统（BMS）",
+      "pagerank": 1.5561730639093283,
+      "pagerank_raw": 1.556,
+      "pagerank_sqrt": 1.247,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 0,
+      "id": 388,
+      "mid": 1,
+      "name": "磷酸铁锂电池",
+      "pagerank": 3.775115571421276,
+      "pagerank_raw": 3.775,
+      "pagerank_sqrt": 1.943,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 105,
+      "down": 0,
+      "id": 389,
+      "mid": 1,
+      "name": "三元电池",
+      "pagerank": 3.6700243123415346,
+      "pagerank_raw": 3.67,
+      "pagerank_sqrt": 1.916,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 0,
+      "id": 390,
+      "mid": 1,
+      "name": "固态锂电池",
+      "pagerank": 2.7924660885554276,
+      "pagerank_raw": 2.792,
+      "pagerank_sqrt": 1.671,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 1,
+      "id": 391,
+      "mid": 0,
+      "name": "下游（电池制造）",
+      "pagerank": 6.815851133600205,
+      "pagerank_raw": 6.816,
+      "pagerank_sqrt": 2.611,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 1,
+      "id": 392,
+      "mid": 0,
+      "name": "新能源汽车",
+      "pagerank": 9.914858597610797,
+      "pagerank_raw": 9.915,
+      "pagerank_sqrt": 3.149,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 1,
+      "id": 393,
+      "mid": 0,
+      "name": "储能领域",
+      "pagerank": 3.2170728656214154,
+      "pagerank_raw": 3.217,
+      "pagerank_sqrt": 1.794,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 1,
+      "id": 394,
+      "mid": 0,
+      "name": "消费电子",
+      "pagerank": 2.812721310678148,
+      "pagerank_raw": 2.813,
+      "pagerank_sqrt": 1.677,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 1,
+      "id": 395,
+      "mid": 0,
+      "name": "电动工具",
+      "pagerank": 2.143468614735421,
+      "pagerank_raw": 2.143,
+      "pagerank_sqrt": 1.464,
+      "type": "link",
+      "up": 0
+    },
+    {
+      "communityId": 396,
+      "down": 1,
+      "id": 396,
+      "mid": 0,
+      "name": "锂电池回收",
+      "pagerank": 0.3368764753668962,
+      "pagerank_raw": 0.337,
+      "pagerank_sqrt": 0.581,
+      "type": "link",
+      "up": 0
+    }
+  ],
+  "环节与产品": [],
+  "环节与公司": [
+    {
+      "from": "铜冠铜箔",
+      "from_type": "company",
+      "id_from": 279,
+      "id_to": 323,
+      "rel": "相关",
+      "to": "铜箔材",
+      "to_type": "link"
+    },
+  ]
+}
+我希望能以这样的数据格式返回我的数据实体结点数据和关系，这是我当前的代码
+app.py中
+# 宏观展示界面的查询接口
+@app.route('/datas', methods=['GET'])
+def get_data():
+    patent = request.args.get('patent', 'false').lower() == 'true'
+    agent = request.args.get('agent', 'false').lower() == 'true'
+    inventor = request.args.get('inventor', 'false').lower() == 'true'
+    ipc = request.args.get('ipc', 'false').lower() == 'true'
+    applicant = request.args.get('applicant', 'false').lower() == 'true'
+    nums = int(request.args.get('nums', 100))
+    start_time = request.args.get('start_time', '1970.01.01')
+    end_time = request.args.get('end_time', '2025.01.01')
+
+    # 实例化Neo4jQuery对象
+    query = Neo4jQuery(url, user, password)
+
+    # 调用函数获取数据
+    results = query.get_filtered_data(patent, agent, inventor, ipc, applicant, nums, start_time, end_time)
+
+    return jsonify({
+        'status': 'success',
+        'message': '数据查询成功',
+        'results': results
+    })
+neo4j/export_data.py中
+ #宏观接口查询
+    def get_filtered_data(self, patent, agent, inventor, ipc, applicant, nums, start_time, end_time):
+        included_labels = []
+        if patent:
+            included_labels.append('Patent')
+        if agent:
+            included_labels.append('Agent')
+        if inventor:
+            included_labels.append('Inventor')
+        if ipc:
+            included_labels.append('IPC')
+        if applicant:
+            included_labels.append('Applicant')
+
+        label_conditions = " OR ".join([f"('{label}' IN labels(node))" for label in included_labels])
+        time_condition = f"AND (node.公开日 >= '{start_time}' AND node.公开日 <= '{end_time}')" if 'Patent' in included_labels else ""
+
+        # 找到最重要的节点
+        find_top_nodes_query = f'''
+        CALL gds.pageRank.stream('fullGraph')
+        YIELD nodeId, score
+        MATCH (node) WHERE id(node) = nodeId
+        WITH node, score
+        WHERE ({label_conditions} {time_condition})
+        ORDER BY score DESC
+        LIMIT {nums}
+        RETURN collect(id(node)) as topNodeIds
+        '''
+
+        # 查询这些节点之间的关系
+        find_relations_query = '''
+        UNWIND $topNodeIds as nodeId
+        MATCH (n) WHERE id(n) = nodeId
+        WITH collect(n) as topNodes
+        UNWIND topNodes as n
+        UNWIND topNodes as m
+        MATCH (n)-[r]->(m)
+        WHERE id(n) <> id(m)
+        RETURN n, r, m
+        '''
+
+        try:
+            # 执行查询找到最重要的节点的ID
+            top_node_ids = self.graph.run(find_top_nodes_query).evaluate()
+
+            # 使用这些节点的ID来找到它们之间的关系
+            if top_node_ids:
+                results = self.graph.run(find_relations_query, topNodeIds=top_node_ids)
+                nodes = [{'startNode': dict(rel['n']), 'relation': dict(rel['r']), 'endNode': dict(rel['m'])} for rel in
+                         results]
+                return nodes
+            else:
+                return []
+        except Exception as e:
+            print(f"查询失败: {e}")
+            return []
+
+{
+  "status": "success",
+  "message": "数据查询成功",
+  "results": {
+    "专利": [...],
+    "IPC": [...],
+    "发明人": [...],
+    "申请人": [...],
+    "代理机构": [...],
+    "专利与专利": [...],
+    "专利与IPC": [...],
+    ...
+  }
+}
+
+

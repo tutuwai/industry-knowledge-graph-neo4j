@@ -1,0 +1,564 @@
+<template>
+  <div>
+     <china-map :api="api" :api_company="api_company" :type="selectedType" />
+  </div>
+  <!-- 复选框 -->
+  <div class="selections">
+    <el-checkbox v-model="up" label="专利" size="large"/>
+    <el-checkbox v-model="mid" label="申请人" size="large"/>
+    <el-checkbox v-model="down" label="发明人" size="large"/>
+  </div>
+  <!-- 时间范围输入查询 -->
+  <div class="in_date">
+    <date-picker v-model="dateRange" @update:value="handleDatepickerChange"/>
+  </div>
+  <!-- 新增：下拉框选择展示类型 -->
+  <div class="display_type">
+    <el-select v-model="selectedType" placeholder="请选择">
+      <el-option label="重要度" value="重要度"></el-option>
+      <el-option label="专利数量" value="专利数量"></el-option>
+    </el-select>
+  </div>
+  <!-- 新增：生成图标按钮 -->
+  <div class="generate_button">
+    <el-button type="primary" @click="updateGraph">更新地图</el-button>
+  </div>
+</template>
+<script>
+import ChinaMap from "@/components/ChinaMap.vue";
+import DatePicker from "../components/DatePicker.vue";
+import moment from "moment";
+
+export default {
+  name: "FourthPage",
+  components: {ChinaMap, DatePicker},
+  data() {
+    return {
+      api: "",
+      api_company: "",
+      up: true,
+      mid: true,
+      down: true,
+      dateRange: [],
+      start_time: "1990-10-10",
+      end_time: "2023-4-10",
+      selectedType: "专利数量",
+    };
+  },
+  methods: {
+    handleDatepickerChange(value) {
+      this.end_time = moment(value).format("YYYY-MM-DD");
+    },
+    // 新增：更新图表方法
+    updateGraph() {
+
+      const params = {
+        up: this.up,
+        mid: this.mid,
+        down: this.down,
+        start_time: this.start_time,
+        end_time: this.end_time,
+      };
+      const queryString = Object.keys(params)
+          .map((key) => key + "=" + params[key])
+          .join("&");
+      this.api = "http://127.0.3.1:5050/datas/location?" + queryString;
+      this.api_company = `http://127.0.3.1:5050/datas?link=false&product=true&company=true&start_time=${this.start_time}&end_time=${this.end_time}`; // 新增
+      console.log("new_api=", this.api);
+      console.log("new_api_company=", this.api_company); // 新增
+    },
+  },
+  mounted() {
+    this.updateGraph();
+  },
+}
+</script>
+以上是我地理位置的src/views/MapPage.vue的vue3界面
+<template>
+  <div class="echarts-map-china" ref="echarts-map-china"></div>
+
+  <div class="echarts-pie">
+    <PieChart :data="options.pieChartData" :title="Pietitle"/>
+  </div>
+  <div class="analysis">
+    <BarChart :data="options.stackedLineChartData" :title="Linetitle"></BarChart>
+  </div>
+</template>
+<script>
+import "../utils/china"
+import * as echarts from 'echarts';
+import axios from 'axios';
+import BarChart from "../components/BarChart.vue";
+import PieChart from "../components/PieChart.vue";
+
+export default {
+  components: {BarChart, PieChart},
+  props: {
+    api: {
+      type: String,
+      required: true,
+    },
+    api_company: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      api1: "",
+      myEcharts: null,
+      options: {
+        title: {
+          text: '专利地图分布',
+          x: "center",
+          textStyle: {
+            fontSize: 19,
+            color: "black"
+          },
+        },
+        tooltip: {
+          trigger: 'item',
+          backgroundColor: "white",
+          formatter: ''
+        },
+        visualMap: {
+          top: '55%',
+          left: '6%',
+          min: 0,
+          max: 50,
+          text: ['High', 'Low'],
+          realtime: true,
+          calculable: true,
+          inRange: {
+            color: ['#dfebff', '#012bfb']
+          }
+        },
+        series: [
+          {
+            name: '模拟数据',
+            type: 'map',
+            mapType: 'china',
+            roam: true,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,
+                  textStyle: {
+                    color: "black"
+                  }
+                }
+              },
+              zoom: 1.5,
+              emphasis: {
+                label: {show: true}
+              }
+            },
+            top: "5%",
+            data: []
+          }
+        ],
+        pieChartData: [],  // 初始化为一个空数组
+        Linetitle:"",
+        Pietitle:"",
+        stackedLineChartData: [],  // 初始化为一个空数组
+        companyData: [],  // 初始化为一个空数组
+        relationData: [],  // 初始化为一个空数组
+        productData: [],  // 初始化为一个空数组
+      }
+    };
+  },
+
+  mounted() {
+    this.myEcharts = echarts.init(this.$refs["echarts-map-china"]);
+    this.updateOptions();
+    this.loadData();
+    // 监听地图点击事件
+    this.myEcharts.on('click', this.handleMapClick);
+  },
+  watch: {
+    api: {
+      handler: function () {
+        this.loadData();
+      },
+      deep: true,
+    },
+    api_company: {  // 新增对 api_company 的观察
+      handler: function () {
+        this.loadCompanyData();
+      },
+      deep: true,
+    },
+    type: {
+      handler: function () {
+        this.updateOptions();
+        this.loadData();
+        this.loadCompanyData();
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    updateOptions() {
+      this.options.tooltip.formatter = `地区：{b}<br/>${this.type}：{c}`;
+    },
+    // 修改 handleMapClick 方法
+    handleMapClick(params) {
+      //更新饼图数据
+      let provinceName = params.name;
+      this.Pietitle = params.name + "省专利资本占比";
+      let companiesInProvince = this.companyData.filter(company => company.地区.includes(provinceName));
+      this.options.pieChartData = companiesInProvince.map(company => {
+        let productsOfCompany = this.relationData.filter(relation => relation.from === company.name);
+        return {
+          name: company.name,
+          value: productsOfCompany.reduce((total, product) => total + company.注册资本万元 * product.weight, 0),
+        };
+      });
+      //更新柱状图数据
+      this.Linetitle = params.name + "省专利产品构成";
+      let productsInProvince = companiesInProvince.reduce((products, company) => {
+        let productsOfCompany = this.relationData.filter(relation => relation.from === company.name).map(relation => {
+          let product = this.productData.find(p => p.name === relation.to);
+          return product ? {
+            name: product.name,
+            type: product.type,
+            value: company.注册资本万元 * relation.weight,
+          } : null;
+        }).filter(product => product);  // 去除 null 值
+        return products.concat(productsOfCompany);
+      }, []);
+
+      let groupedData = {};
+      productsInProvince.forEach(product => {
+        if (!groupedData[product.name]) {
+          groupedData[product.name] = {'专利': 0, '申请人': 0, '发明人': 0};
+        }
+        if (product.type === 1) {
+          groupedData[product.name]['专利'] += product.value;
+        } else if (product.type === 2) {
+          groupedData[product.name]['申请人'] += product.value;
+        } else if (product.type === 3) {
+          groupedData[product.name]['发明人'] += product.value;
+        }
+      });
+
+      this.options.stackedLineChartData = Object.entries(groupedData).map(([productName, typeSums]) => {
+        return {
+          name: productName,
+          专利: typeSums['专利'],
+          申请人: typeSums['申请人'],
+          发明人: typeSums['发明人']
+        };
+      });
+
+      console.log(this.options.stackedLineChartData)
+
+    },
+    loadData() {
+      return axios.get(this.api).then(response => {
+        if (response.data.status === 'success') {
+          const data = response.data.results[this.type];
+          console.log(this.type);
+          const maxValue = Math.max(...data.map(item => item.value));
+          this.options.visualMap.max = maxValue / 2;
+          this.options.series[0].data = data;
+          this.myEcharts.setOption(this.options);
+        } else {
+          console.error('数据请求失败');
+        }
+      }).catch(error => {
+        console.error(error);
+      });
+    },
+    // 修改 loadCompanyData 方法
+    loadCompanyData() {
+      return axios.get(this.api_company).then(response => {
+        if (response.data.status === 'success') {
+          this.companyData = response.data.results.公司.map(company => {
+            return {
+              name: company.name,
+              地区: company.所属地区,
+              注册资本万元: company.注册资本万元,
+            };
+          });
+          this.productData = response.data.results.产品.map(product => {
+            let type = product.up ? 1 : product.mid ? 2 : product.down ? 3 : 0;
+            return {
+              name: product.name,
+              type: type,
+            };
+          });
+          this.relationData = response.data.results.公司与产品.map(relation => {
+            return {
+              from: relation.from,
+              to: relation.to,
+              weight: relation.weight,
+            };
+          });
+          console.log('公司数据:', this.companyData);
+          console.log('产品数据:', this.productData);
+          console.log('关系数据:', this.relationData);
+        } else {
+          console.error('公司数据请求失败');
+        }
+      }).catch(error => {
+        console.error(error);
+      });
+    },
+  }
+};
+</script>
+上面是我src/components/ChinaMap.vue的代码，我现在在修改把原来的产业链系统改成现在的专利分析系统，所以上面代码中原来的url和数据读取格式要改
+现在我想把你刚刚给我写的接口(http://127.0.3.1:5001/datas/location?time=2024.04.10)应用到我的chinamap上，请问要做那些修改
+
+
+刷新界面时通过http://127.0.3.1:5050/datas?link=false&product=true&company=true&start_time=1990-10-10&end_time=2023-4-10
+请求到上下游数据格式是
+{message:“数据查询成功", results: {.…}, status : "success"}
+message:“数据查询成功”
+results: {,…]
+产品:[{communityId: 396，down: 0, id: 476，mid: 1,name:
+产品与产品:[{from: “锂电池正极材料""，from_type: "product",公司:[....]
+公司与产品:[{from: "西藏矿业"， from_type: "company", id_frc公司与供应商:[{from: "长安汽车"， id_from: 4， id_to: 57,rel公司与新闻:[]
+新闻:[]
+环节:[]
+环节与产品:[]环节与公司:[]环节与环节:[]status: "success"]
+status : "success"
+将拿到的公司数据处理成：
+{
+    "name": "康普化学",
+    "地区": "西南地区-重庆-重庆市",
+    "注册资本万元": "9164.25"
+}
+产品数据处理成
+{
+    "name": "锂离子电池隔膜",
+    "type": 2
+}
+关系数据处理成
+{
+    "from": "西藏矿业",
+    "to": "锂类",
+    "weight": "0.093659"
+}
+点击省份去更新圆饼图：
+      //更新饼图数据
+      let provinceName = params.name;
+      this.Pietitle = params.name + "省企业锂电池产业资本占比";
+      let companiesInProvince = this.companyData.filter(company => company.地区.includes(provinceName));
+      this.options.pieChartData = companiesInProvince.map(company => {
+        let productsOfCompany = this.relationData.filter(relation => relation.from === company.name);
+        return {
+          name: company.name,
+          value: productsOfCompany.reduce((total, product) => total + company.注册资本万元 * product.weight, 0),
+        };
+      });
+处理成公司名加占比
+
+饼图的功能是展示各个省份中不同IPC专利数量占比
+省份-申请人(province)-申请->专利-属于->IPC分类
+
+数据格式
+"山东" :[
+
+]
+柱状图功能是展示各个省份专利的申请人比较重要的申请人，发明人，申请机构
+
+专利地域信息
+请求到数据集格式如下
+{
+  "status": "success",
+  "message": "数据查询成功",
+  "results": {
+    "专利": [ {
+                "id": 30,
+                "pageRankScore": 11.563378369519324,
+                "type": "专利",
+                "公开号": "CN105934322A",
+                "公开日": "2016.09.07",
+                "名称": "通过连续填料浆料挤出的聚合物组合物",
+                "摘要": "本发明提供用于生产聚合物组合物的创造性方法，所述方法包括将填料并入聚合物材料中，其中在填料并入期间的所述聚合物材料处于至少部分熔融态并且其中所述填料以浆料形式被并入。",
+                "文献类型": "发明",
+                "申请号": "CN201480070466.7",
+                "申请日": "2014.12.17"
+            }],
+    "IPC": [{
+                "id": 5776,
+                "pageRankScore": 93.37297563224972,
+                "type": "IPC",
+                "名称": "E21F17/18"
+            }],
+    "发明人": [{
+                "id": 11236,
+                "pageRankScore": 26.830267249806365,
+                "type": "发明人",
+                "名称": "何川"
+            }],
+    "申请人": [{
+                "id": 31716,
+                "pageRankScore": 33.3635236584548,
+                "type": "申请人",
+                "名称": "西南交通大学",
+                "邮编": "610031.0"
+            }],
+    "代理机构": [{
+                "id": 9809,
+                "pageRankScore": 24.001806252940053,
+                "type": "代理机构",
+                "名称": "济南圣达知识产权代理有限公司"
+            }],
+    "专利与专利": [{
+                "from": "CN206103150U",
+                "from_type": "专利",
+                "id_from": 1333,
+                "id_to": 1354,
+                "rel": "CITES_BY",
+                "to": "CN106075773A",
+                "to_type": "专利"
+            }],
+    "专利与IPC": [{
+                "from": "CN117266872A",
+                "from_type": "专利",
+                "id_from": 5544,
+                "id_to": 5776,
+                "rel": "BELONGS_TO",
+                "to": "E21F17/18",
+                "to_type": "IPC"
+            }],
+    "专利与发明人": [ {
+                "from": "CN206021335U",
+                "from_type": "专利",
+                "id_from": 1188,
+                "id_to": 12214,
+                "rel": "INVENTED_BY",
+                "to": "张伟",
+                "to_type": "发明人"
+            }],
+    "专利与代理机构": [ {
+                "from": "CN108037770A",
+                "from_type": "专利",
+                "id_from": 1839,
+                "id_to": 9809,
+                "rel": "REPRESENTED_BY",
+                "to": "济南圣达知识产权代理有限公司",
+                "to_type": "代理机构"
+            }],
+  }
+}
+
+
+
+<template>
+  <div ref="chartRef" class="stacked-line-chart"></div>
+</template>
+
+<script>
+import {onMounted, ref, watchEffect} from "vue";
+import * as echarts from "echarts";
+
+export default {
+  name: "StackedLineChart",
+  props: {
+    id: {
+      type: String,
+      default: "",
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    data: {
+      type: Array,
+      required: true,
+    },
+  },
+  setup(props) {
+    const chartRef = ref(null);
+    let myChart = null;
+
+    onMounted(() => {
+      myChart = echarts.init(chartRef.value);
+      renderChart();
+    });
+
+    watchEffect(() => {
+      console.log('props.data:', props.data);
+      if (props.data.length && myChart) {
+        renderChart();
+      }
+    });
+
+    function renderChart() {
+      // 清除图表的当前状态
+      myChart.clear();
+
+      // 映射数据到各个系列
+      const seriesData = props.data.map(product => {
+        return {
+          name: product.name,
+          type: 'bar',
+          stack: '总量',
+          data: ['专利', '申请人', '发明人'].map(type => product[type])
+        };
+      });
+
+      const option = {
+        title: {
+          text: props.title,
+          left: 'center'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          },
+          formatter: function (params) {
+            // 只显示有值的提示框
+            let result = params[0].axisValueLabel + '<br>';
+            params.forEach(param => {
+              if (param.value > 0) {
+                result += `${param.marker} ${param.seriesName}: ${param.value}<br>`;
+              }
+            });
+            return result;
+          },
+        },
+        legend: {
+          show: false, // 隐藏图例
+        },
+        grid: {
+          bottom: '8%', // 调整图表在 div 内的位置
+          containLabel: true // 是否包含坐标轴标签，默认为 false
+        },
+        xAxis: {
+          type: 'category',
+          data: ['专利', '申请人', '发明人']
+        },
+        yAxis: {},
+        series: seriesData
+      };
+
+      // 将配置项应用到图表实例
+      myChart.setOption(option);
+    }
+
+    return {
+      chartRef,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.stacked-line-chart {
+  width: 480px;
+  height: 290px;
+}
+</style>
+
+现在圆饼图可以做到点击一个地区显示相应的ipc构成但是柱状图的显示还是有问题以上是src/components/BarChart.vue柱状图的代码，这个柱状图是用的echarts，
+柱状图横坐标分别是专利，申请人，发明人，我希望鼠标放到上面能显示他们的构成，请告诉我要怎么修改才能让柱状图正常显示并达到我想要的效果

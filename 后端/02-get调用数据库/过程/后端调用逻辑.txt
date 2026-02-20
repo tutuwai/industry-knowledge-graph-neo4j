@@ -1,0 +1,133 @@
+    1.neo4j数据库基本情况
+    实体结点属性一栏
+> ├── Patent # 专利
+> │   ├── 公开号
+> │   ├── 公开日
+> │   ├── 名称
+> │   ├──摘要
+> │   ├──文献类型
+> │   ├──申请号
+> │   └── 申请日
+> ├── Agent # 代理机构
+> │   └── 名称
+> ├── Inventor # 发明人
+> │   └── 名称
+> ├── IPC # IPC分类号
+> │   └── 名称
+> ├── Applicant # 申请人
+> │   ├── 名称
+> │   └── 邮编
+
+结点关系一栏
+> (Patent )-[CITES_BY]->(Patent ) #专利被专利引用
+>
+> (Patent )-[APPLIED_BY]->(Applicant ) #专利被申请人申请
+>
+> (Patent )-[BELONGS_TO]->(IPC ) #专利属于该IPC分类号
+>
+> (Patent )-[INVENTED_BY]->(Inventor ) #专利被发明人发明
+>
+> (Patent )-[REPRESENTED_BY]->(Agent ) #专利被代理人申请
+另外每个实体结点都有一个pageRankScore的属性
+    2.基本函数
+    '''查找实体'''
+    '''功能:根据pageRankScore阈值筛选实体,筛选出高于该值的实体'''
+    '''
+    参数:
+        "label": "实体类型"
+        "property_key"="属性名称",
+        "property_value"="值"
+    返回:
+        成功:返回查询结果的数组
+        失败:返回Flase
+    '''
+    def search_entities(self, label=None, property_key=None, property_value=None)
+    '''查找关系'''
+    '''功能:根据关系两端的pageRankScore阈值筛选关系,筛选出高于该值的关系'''
+    '''
+    参数:
+        "rel_type": "关系类型"
+        "property_key"="关系属性名称",
+        "from_value"="值"
+        "to_value"="值"
+    返回:
+        查询结果的数组
+    '''
+    def search_relationships(self, rel_type=None, property_key=None, from_value=None, to_value=None):
+    3.函数规范定义
+        #规定返回的格式
+        self.search_return = {
+            '专利': "RETURN n, id(n)",
+            '代理机构': "RETURN n, id(n)",
+            '发明人': "RETURN n, id(n)",
+            'IPC': "RETURN n, id(n)",
+            '申请人': "RETURN n, id(n)",
+            '专利与专利': "RETURN n.公开号 as from,m.公开号 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与代理机构': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与IPC': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与发明人': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与申请人': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel"
+        }
+        self.search_match = {
+            '专利': "MATCH (n:Patent) ",
+            '代理机构': "MATCH (n:Agent) ",
+            '发明人': "MATCH (n:Inventor) ",
+            'IPC': "MATCH (n:IPC) ",
+            '申请人': "MATCH (n:Applicant) ",
+            '专利与专利': "MATCH p = (n:Patent)-[r]->(m:Patent) ",
+            '专利与申请人': "MATCH p = (n:Patent)-[r]->(m:Applicant) ",
+            '专利与IPC': "MATCH p = (n:Patent)-[r]->(m:IPC) ",
+            '专利与发明人': "MATCH p = (n:Patent)-[r]->(m:Inventor) ",
+            '专利与代理机构': "MATCH p = (n:Patent)-[r]->(m:Agent) "
+        }
+        self.search_label = {
+            '专利': "Patent",
+            '代理机构': "Agent",
+            '发明人': "Inventor",
+            'IPC': "IPC",
+            '申请人': "Applicant"
+        }
+现在我要修改我的宏观查询接口的逻辑,输入的是这五个实体的分数，查询返回的是这5个实体和关系的json数据如下面这样：
+        {
+  "status": "success",
+  "message": "数据查询成功",
+  "results": {
+    "专利": [...],
+    "IPC": [...],
+    "发明人": [...],
+    "申请人": [...],
+    "代理机构": [...],
+    "专利与专利": [...],
+    "专利与IPC": [...],
+    ...
+  }
+}
+这是你需要完善的接口函数
+neo4j/export_data.py中
+     # 宏观接口查询
+    def get_filtered_data(self, score_patent, score_agent, score_inventor, score_ipc, score_applicant):
+app.py中去调用export_data的get_filtered_data
+from flask import Flask, request, jsonify
+from flask.views import MethodView
+from flask_cors import CORS
+from neo4j.export_data import Neo4jQuery  # 确保导入正确
+
+app = Flask(__name__)
+CORS(app)  # 简化跨域处理初始化
+
+# 数据库的基础配置（这部分看起来是你用到的，保留下来了）
+url = 'http://localhost:7474/browser/'
+user = 'neo4j'
+password = 'CHW123d456'
+
+
+# 首页请求处理
+@app.route('/')
+def hello_world():
+    return 'Hello World!'
+
+
+# 宏观展示界面的查询接口
+# app.py
+@app.route('/datas', methods=['GET'])
+def get_data():

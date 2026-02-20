@@ -1,0 +1,32 @@
+// 查询专利节点及其关联的申请人，专利和申请人的PageRank分数分别超过10和7
+MATCH p= (patent:Patent)-[r:APPLIED_BY]->(applicant:Applicant)
+WHERE patent.pageRankScore > 7 AND applicant.pageRankScore > 10
+RETURN p
+
+UNION
+
+// 查询专利节点及其所属的IPC分类号，专利和IPC分类号的PageRank分数分别超过10和2
+MATCH p= (patent:Patent)-[r:BELONGS_TO]->(ipc:IPC)
+WHERE patent.pageRankScore > 7 AND ipc.pageRankScore > 40
+RETURN p
+
+UNION
+
+// 查询专利节点及其发明人，专利和发明人的PageRank分数分别超过10和7
+MATCH p= (patent:Patent)-[r:INVENTED_BY]->(inventor:Inventor)
+WHERE patent.pageRankScore > 7 AND inventor.pageRankScore > 3
+RETURN p
+
+UNION
+
+// 查询专利节点及其代理机构，专利和代理机构的PageRank分数分别超过10和5
+MATCH p= (patent:Patent)-[r:REPRESENTED_BY]->(agent:Agent)
+WHERE patent.pageRankScore > 7 AND agent.pageRankScore > 10
+RETURN p
+
+UNION
+
+// 查询专利节点及其引用的其他专利，两个专利的PageRank分数都超过10
+MATCH p= (patent1:Patent)-[r:CITES_BY]->(patent2:Patent)
+WHERE patent1.pageRankScore > 7 AND patent2.pageRankScore > 5
+RETURN p

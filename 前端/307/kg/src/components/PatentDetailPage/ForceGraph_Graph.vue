@@ -1,0 +1,592 @@
+<!--<template>-->
+<!--  <svg id="svg1" style="width: 100%; height: 100%;"></svg>-->
+<!--</template>-->
+<template>
+  <svg width="1000" height="550" id="svg1"></svg>
+</template>
+<script>
+import {watchEffect, onMounted, onUnmounted} from "vue";
+import * as d3 from 'd3';
+import axios from "axios";
+
+export default {
+  name: 'ForceGraph',
+  props: {
+    url: {
+      type: String,
+      required: true
+    },
+    thresholds: {
+      type: Object,
+      required: true
+    },
+  },
+
+  data() {
+    return {
+      nodes: [],
+      links: [],
+      colors: ['#6aabd1', '#fdae61', '#e76f51'
+        , '#38dac1', '#f53064'],
+      link_colors: ['#cd2626', '#63aa40', '#0021ff', '#d13ebb'
+        , '#f6038c', '#e1d70d', '#1bcc61'],//线的颜色
+      statistics: {
+        专利: 0,
+        代理机构: 0,
+        发明人: 0,
+        IPC: 0,
+        申请人: 0,
+        专利与专利: 0,
+        专利与IPC: 0,
+        专利与发明人: 0,
+        专利与代理机构: 0
+      },
+    }
+  },
+  mounted() {
+    onMounted(() => {
+      this.initGraph();
+    });
+    watchEffect(() => {
+      if (this.url) {
+        this.loadData();
+      }
+    });
+    onUnmounted(() => {
+      this.clearData();
+    });
+    watchEffect(() => {
+      this.updateNodeVisibility();
+      console.log("thresholds.patent", this.thresholds.patent);
+      console.log("thresholds.agent", this.thresholds.agent);
+      console.log("thresholds.inventor", this.thresholds.inventor);
+      console.log("thresholds.ipc", this.thresholds.ipc);
+      console.log("thresholds.applicant", this.thresholds.applicant);
+      this.updateStatisticsAndEmit();
+    });
+  },
+  methods: {
+    clearData() {
+      this.nodes = [];
+      this.links = [];
+    },
+    shouldBeVisible(node) {
+      // 假设结点类型对应 'group' 属性和阈值键值
+      const typeToThresholdKey = ['patent', 'agent', 'inventor', 'ipc', 'applicant'];
+      const thresholdKey = typeToThresholdKey[node.group];
+      return node.pageRankScore >= this.thresholds[thresholdKey];
+    },
+
+    updateStatisticsAndEmit() {
+      // 筛选可见的结点和关系
+      const visibleNodes = this.nodes.filter(this.shouldBeVisible);
+      const visibleLinks = this.links.filter(link => {
+        return this.shouldBeVisible(link.source) && this.shouldBeVisible(link.target);
+      });
+
+      // 分别统计各种类的结点数量
+      const patents = visibleNodes.filter(node => node.group === 0);
+      const agencies = visibleNodes.filter(node => node.group === 1);
+      const inventors = visibleNodes.filter(node => node.group === 2);
+      const ipcs = visibleNodes.filter(node => node.group === 3);
+      const applicants = visibleNodes.filter(node => node.group === 4);
+
+      // 分别统计各种类的关系数量
+      const patentsToPatents = visibleLinks.filter(link => link.group === 5);
+      const patentsToIpcs = visibleLinks.filter(link => link.group === 6);
+      const patentsToInventors = visibleLinks.filter(link => link.group === 7);
+      const patentsToAgencies = visibleLinks.filter(link => link.group === 8);
+      const patentsToapplicants = visibleLinks.filter(link => link.group === 9);
+
+      // 更新统计信息对象
+      this.statistics = {
+        专利: patents.length,
+        代理机构: agencies.length,
+        发明人: inventors.length,
+        IPC: ipcs.length,
+        申请人: applicants.length,
+        专利与专利: patentsToPatents.length,
+        专利与IPC: patentsToIpcs.length,
+        专利与发明人: patentsToInventors.length,
+        专利与代理机构: patentsToAgencies.length,
+        专利与申请人: patentsToapplicants.length,
+      };
+
+      // 将更新的统计信息发送给父组件
+      this.$emit('update-statistics', this.statistics);
+    },
+
+    updateNodeVisibility() {
+      const svg = d3.select("#svg1");
+
+      const visibleNodes = svg
+          .selectAll("circle")
+          .filter(this.shouldBeVisible)
+          .data();
+
+      svg.selectAll("circle")
+          .attr("display", (d) => this.shouldBeVisible(d) ? "inline" : "none")
+          // .attr("fill", (d) => {
+          //   if (d.group === 0) return "rgb(158,222,222)";
+          //   if (d.group === 1) return "#f1662b";
+          //   if (d.group === 2) return "#FFC0CB";
+          //   return d.color; // 保留原有颜色
+          // });
+          .attr("fill", (d) => {
+            // 使用 colors 数组为每个结点设置颜色
+            return this.colors[d.group];
+          });
+      svg.selectAll(".links").selectAll("path").attr("display", (d) => {
+        const sourceVisible = visibleNodes.some(e => e.id === d.source.id);
+        const targetVisible = visibleNodes.some(e => e.id === d.target.id);
+        return sourceVisible && targetVisible ? "inline" : "none";
+      });
+
+      svg.selectAll(".linktexts").selectAll("text").attr("display", (d) => {
+        const sourceVisible = visibleNodes.some(e => e.id === d.source.id);
+        const targetVisible = visibleNodes.some(e => e.id === d.target.id);
+        return sourceVisible && targetVisible ? "inline" : "none";
+      });
+
+      svg.selectAll(".texts").selectAll("text").attr("display", (d) => this.shouldBeVisible(d) ? "inline" : "none");
+    }
+    ,
+
+
+    async loadData() {
+      try {
+        this.clearData();
+        const response = await axios.get(this.url);
+        const results = response.data.results;
+
+        // 处理专利节点
+        results.专利.forEach(item => {
+          this.nodes.push({
+            ...item,
+            group: 0 // 分配不同的group用于视觉区分
+          });
+        });
+
+        // 处理代理机构节点
+        results.代理机构.forEach(item => {
+          this.nodes.push({
+            ...item,
+            group: 1
+          });
+        });
+
+        // 处理发明人节点
+        results.发明人.forEach(item => {
+          this.nodes.push({
+            ...item,
+            group: 2
+          });
+        });
+
+        // 处理IPC节点
+        results.IPC.forEach(item => {
+          this.nodes.push({
+            ...item,
+            group: 3
+          });
+        });
+
+        // 处理申请人节点
+        results.申请人.forEach(item => {
+          this.nodes.push({
+            ...item,
+            group: 4
+          });
+        });
+
+        // 处理专利与专利关系
+        results.专利与专利.forEach(link => {
+          this.links.push({
+            source: link.id_from,
+            target: link.id_to,
+            type: link.rel,
+            group: 5
+          });
+        });
+
+        // 处理专利与IPC关系
+        results.专利与IPC.forEach(link => {
+          this.links.push({
+            source: link.id_from,
+            target: link.id_to,
+            type: link.rel,
+            group: 6
+          });
+        });
+
+        // 处理专利与发明人关系
+        results.专利与发明人.forEach(link => {
+          this.links.push({
+            source: link.id_from,
+            target: link.id_to,
+            type: link.rel,
+            group: 7
+          });
+        });
+
+        // 处理专利与代理机构关系
+        results.专利与代理机构.forEach(link => {
+          this.links.push({
+            source: link.id_from,
+            target: link.id_to,
+            type: link.rel,
+            group: 8
+          });
+        });
+        // 处理专利与代理机构关系
+        results.专利与申请人.forEach(link => {
+          this.links.push({
+            source: link.id_from,
+            target: link.id_to,
+            type: link.rel,
+            group: 9
+          });
+        });
+        console.log('links:', this.links);
+        console.log('nodes:', this.nodes);
+        this.drawGraph();
+      } catch (error) {
+        console.error('加载数据失败:', error);
+      }
+    },
+    initGraph() {
+      // 调用 loadData 方法加载数据
+      this.loadData();
+    },
+    drawGraph() {
+      // 在这里先清除之前的图形
+      d3.select("#svg1").selectAll("*").remove();
+      const svg = d3.select("#svg1"), //选择svg1
+          width = svg.attr("width"), //设定宽度
+          height = svg.attr("height"); //设定高度
+
+      const defs = svg.append('defs');
+
+// 箭头定义
+      defs.append('marker')
+          .data(this.links)
+          .attr('id', 'arrow')
+          .attr('viewBox', '0 -5 10 10')
+          .attr('refX', 3) // 修改 refX 值使箭头更靠近线条端点
+          .attr('refY', 0)
+          .attr('markerWidth', 3) // 减小箭头宽度
+          .attr('markerHeight', 3) // 减小箭头高度
+          .attr('orient', 'auto')
+          .append('path')
+          .attr('d', 'M0,-4L8,0L0,4') // 修改箭头形状，使其更细长
+          .attr('fill', d => getLinkStyle(d).stroke);
+
+
+      //利用d3.forceSimulation()定义d3力导向图，力模拟
+      const simulation = d3.forceSimulation()
+          //让互相之间有link的节点保持一个特定的距离在保持一定距离的前提下，若超出该范围，就会多增加一个力
+          .force("link", d3.forceLink().id(function (d) {
+                return d.id;
+              })
+                  .distance(80) // link 之间的距离
+                  .strength(0.1) // link 之间的相互作用力量
+          )
+          //粒子之间两两作用的力，如果为正就互相吸引，为负就互相排斥，要设置strength规定力的大小
+          .force("charge", d3.forceManyBody().strength(-25))
+          .force("center", d3.forceCenter(width / 2, height / 2))//指向某一个中心的力，会尽可能让粒子向中心靠近或重合
+          .force("collision", d3.forceCollide(45)) // 碰撞检测，避免结点重叠
+      // ***********很重要！！！！！在此处保存Vue组件的 this 引用
+      const vm = this;
+      //simulation中ticked数据初始化并生成图形
+      //通过tick事件来更新节点的状态的，状态包括位置，速度，加速度等
+      simulation.nodes(this.nodes).on("tick", ticked); //必须放前面，不然初始化不了位置坐标
+      // 在 drawGraph() 中更新距离逻辑
+      simulation.force("link").links(this.links).distance(d => {
+        let distance = 80; // 基础长度
+        switch (d.group) {
+          case 5: // 专利与专利
+            distance += 100; // 专利之间的关系
+            break;
+          case 6: // 专利与IPC
+            distance += 200; // IPC关系设置较长距离，因为IPC数量少
+            break;
+          case 7: // 专利与发明人
+            distance += 150; // 发明人数量适中
+            break;
+          case 8: // 专利与代理机构
+            distance += 200; // 代理机构较少，设置较长距离
+            break;
+          case 9: // 专利与申请人
+            distance += 200; // 申请人较少，设置较长距离
+            break;
+          default:
+            distance += 80; // 默认值
+            break;
+        }
+        return distance / 2; // 返回计算后的距离
+      });
+
+
+      function ticked() {
+        // 更新贝塞尔曲线的路径
+        link.attr('d', function (d) {
+          const dx = d.target.x - d.source.x;
+          const dy = d.target.y - d.source.y;
+          const dr = Math.sqrt(dx * dx + dy * dy);
+          const mx = (d.source.x + d.target.x) / 2;
+          const my = (d.source.y + d.target.y) / 2;
+          const qx = mx + dy / dr * 30; // 30 控制曲线的弯曲程度
+          const qy = my - dx / dr * 30;
+          //return `M${d.source.x},${d.source.y}Q${qx},${qy} ${d.target.x},${d.target.y}`;
+          const r = d.target.r || (d.target.group === 0 ? 16 : d.target.group === 1 ? 12 : d.target.group === 2 ? 8 : 9);
+          //const r = d.target.r || 16; // 获取终点半径，如果没有设置则默认为 9
+          const tr = r + 4; // 曲线终点距离目标节点边缘的距离
+          const tx = d.target.x + tr * (d.source.x - d.target.x) / dr;
+          const ty = d.target.y + tr * (d.source.y - d.target.y) / dr;
+          return `M${d.source.x},${d.source.y}Q${qx},${qy} ${tx},${ty}`;
+        });
+
+
+        linktext.attr("x", d => {
+          const dx = d.target.x - d.source.x;
+          const dy = d.target.y - d.source.y;
+          const dr = Math.sqrt(dx * dx + dy * dy);
+          const mx = (d.source.x + d.target.x) / 2;
+          const qx = mx + dy / dr * 30; // 30 控制曲线的弯曲程度
+          return (d.source.x + qx) / 2;
+        })
+            .attr("y", d => {
+              const dx = d.target.x - d.source.x;
+              const dy = d.target.y - d.source.y;
+              const dr = Math.sqrt(dx * dx + dy * dy);
+              const my = (d.source.y + d.target.y) / 2;
+              const qy = my - dx / dr * 30;
+              return (d.source.y + qy) / 2;
+            });
+        node.attr("cx", d => d.x)
+            .attr("cy", d => d.y)
+
+        text.attr("x", d => d.x)
+            .attr("y", d => d.y)
+
+      }
+
+
+      // g用于绘制所有边,selectALL选中所有的line,并绑定数据data(links),enter().append("line")添加元素
+      // 使用<path>元素而非<line>元素
+      const link = svg.append('g')
+          .attr("class", "links")
+          .selectAll("path")
+          .data(this.links)
+          .enter().append("path")
+          .attr('stroke', d => getLinkStyle(d).stroke)
+          .attr('stroke-width', d => getLinkStyle(d).strokeWidth) //根据关系类型设置线宽
+          .attr('stroke-dasharray', d => getLinkStyle(d).strokeDasharray) //根据关系类型设置线样式
+          .attr('fill', 'none') // 设置填充为无
+          .attr('marker-end', 'url(#arrow)'); // 在曲线中间添加箭头
+
+
+      //边上的文字，即实体之间的关系
+      const linktext = svg.append('g')
+          .attr("class", "linktexts")
+          .selectAll("text")
+          .data(this.links)
+          .enter().append("text")
+          //.style("display", "block")
+          .style('text-anchor', 'middle')
+          .style('fill', '#444')
+          .attr("font-size", 6)
+          .text(function (d) {
+            return d.type; //绑定关系连线上的文字
+          });
+      //圆
+      const node = svg.append('g')
+          .attr("class", "nodes")
+          .selectAll("circle")  //选中所有的圆
+          .data(this.nodes) //修改为指定结点集
+          .enter().append("circle")
+          .attr("r", function (d) {
+            let size = 8; // 默认大小
+            switch (d.group) {
+              case 0:
+                size = 8;  // 专利
+                break;
+              case 1:
+                size = 10;  // 代理机构
+                break;
+              case 2:
+                size = 5;  // 发明人
+                break;
+              case 3:
+                size = 12;  // IPC
+                break;
+              case 4:
+                size = 13;  // 申请人
+                break;
+              default:
+                size = 5;  // 其他
+                break;
+            }
+            return size * 2;  // 直接返回半径值
+          })
+          // .attr('fill', function (d) { // 填充的颜色
+          //   return vm.colors[d.group]; //颜色的this和tick绑定的this不同，用tick前需保存
+          // })
+          .attr('fill', function (d) {
+            const additionalColors = ['#f60e0e', '#e00c1f', '#f50606', '#f50606', '#ffcccc']; // 扩展颜色数组
+            return additionalColors[d.group] || vm.colors[d.group]; // 选择颜色
+          })//结点颜色
+          .attr('stroke', '#000') // 添加黑色轮廓
+          .attr('stroke-width', '1') // 调整轮廓宽度
+          //.attr('stroke', 'none')    // 没有描边
+          .attr('name', function (d) {
+            return d.名称;    //圆的名字
+          })
+          .attr("display", d => {
+            return d.group === 1 && d.date < this.time ? "none" : "inline";
+          })
+          .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended));
+      // 文本
+      const text = svg.append('g')
+          .attr("class", "texts")
+          .selectAll("text")
+          .data(this.nodes)
+          .enter().append("text")
+          .attr("font-size", function (d) {
+            let size
+            switch (d.group) {
+              case 0:
+                size = 5.6;  // 专利
+                break;
+              case 1:
+                size = 10;  // 代理机构
+                break;
+              case 2:
+                size = 5;  // 发明人
+                break;
+              case 3:
+                size = 8;  // IPC
+                break;
+              case 4:
+                size = 13;  // 申请人
+                break;
+              default:
+                size = 5;  // 其他
+                break;
+            }
+            return size
+          })
+          .attr("fill", '#444') // 文本用黑色
+          .attr('name', function (d) {
+            return d.名称;
+          })
+          .attr('text-anchor', 'middle') // 文本居中
+          .text(function (d) {
+            // 根据结点类型调整显示的文本
+            switch (d.group) {
+              case 0:
+                return d.名称.substring(0, 5) + (d.名称.length > 5 ? '...' : ''); // 专利显示前5个字
+              case 3:
+                return d.名称; // IPC 显示全部
+              default:
+                return d.名称.substring(0, 3) + (d.名称.length > 3 ? '...' : ''); // 其他显示全部
+            }
+          })
+          .attr("display", d => {
+            return d.group === 1 && d.date < this.time ? "none" : "inline";
+          })
+          .call(d3.drag()
+              .on("start", dragstarted)
+              .on("drag", dragged)
+              .on("end", dragended));
+
+      //选择线条样式的函数
+      function getLinkStyle(d) {
+        switch (d.type) {
+          case 'CITES_BY':
+            return {strokeWidth: 1, strokeDasharray: '5,5', stroke: '#FF6F00'}; // 较粗的橙色虚线
+          case 'BELONGS_TO':
+            return {strokeWidth: 1, strokeDasharray: '', stroke: '#3F51B5'}; // 紫色实线
+          case 'INVENTED_BY':
+            return {strokeWidth: 1, strokeDasharray: '', stroke: '#2196F3'}; // 蓝色实线
+          case 'REPRESENTED_BY':
+            return {strokeWidth: 1, strokeDasharray: '', stroke: '#9C27B0'}; // 紫罗兰实线
+          case 'APPLIED_BY':
+            return {strokeWidth: 1, strokeDasharray: '', stroke: '#009688'}; // 绿色虚线
+            // case '相关产品':
+            //   return {strokeWidth: 2, strokeDasharray: '', stroke: '#4CAF50'}; // 绿色实线
+            // case '主营产品':
+            //   return {strokeWidth: 2, strokeDasharray: '', stroke: '#FFC107'}; // 红黄色实线
+            // case '产品小类':
+            //   return {strokeWidth: 1, strokeDasharray: '', stroke: '#795548'}; // 棕色实线
+            // case '供应商':
+            //   return {strokeWidth: 1, strokeDasharray: '1,1', stroke: '#E91E63'}; // 粉红色虚线
+            // case '客户':
+            //   return {strokeWidth: 1, strokeDasharray: '1,1', stroke: '#CDDC39'}; // 绿黄色虚线
+            // case '上游材料':
+            //   return {strokeWidth: 1, strokeDasharray: '', stroke: '#FF5722'}; // 橙红色实线
+            // case '下游产品':
+            //   return {strokeWidth: 1, strokeDasharray: '', stroke: '#607D8B'}; // 蓝灰色实线
+            // case '关联':
+            //   return {strokeWidth: 1, strokeDasharray: '1,1', stroke: '#9E9E9E'}; // 灰色虚线
+          default:
+            return {strokeWidth: 1, strokeDasharray: '', stroke: '#da0d0d'}; // 黑色实线
+        }
+
+
+      }
+
+      //d3v4版本事件需要d3.event这样表达(缩放和拖拽同理)，v7不需要，
+      //鼠标选中边上文字拖动即可实现全局拖动
+      function dragstarted(d) {
+        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x;
+        d.fy = d.y;
+      }
+
+      //拖拽中的回调函数，参数还是为node节点，这里不断的更新节点的固定坐标根据鼠标事件的坐标
+      function dragged(d) {
+        d.fx = d3.event.x;
+        d.fy = d3.event.y;
+      }
+
+      //拖拽结束回调函数，参数也是node节点，判断事件状态动画系数设置为0结束动画，并设置固定坐标都为null。
+      function dragended(d) {
+        if (!d3.event.active) simulation.alphaTarget(0);
+        d.fx = null;
+        d.fy = null;
+      }
+
+      // 给node加title, 当鼠标悬浮在圆圈上的时候，显示结点名称
+      node.append('title').text(function (d) {
+        return d.名称;
+      });
+      text.append('title').text(function (d) {
+        return d.名称;
+      });
+
+      //处理缩放可缩放范围：8倍
+      svg.call(d3.zoom().scaleExtent([1 / 8, 8]).on("zoom", () => {
+        link.attr("transform", d3.event.transform);
+        node.attr("transform", d3.event.transform);
+        text.attr("transform", d3.event.transform);
+        linktext.attr('transform', d3.event.transform);
+      }));
+      svg.on('click', () => {
+        this.$emit('clickNode', null); // 点击空白区域时取消选择的节点
+      });
+      // 添加节点点击事件监听器
+      node.on('click', (d) => {
+        this.$emit('clickNode', d); // 触发父组件的showNodeInfo方法
+      });
+      // 添加节点点击事件监听器
+      text.on('click', (d) => {
+        this.$emit('clickNode', d); // 触发父组件的showNodeInfo方法
+      });
+    },
+  }
+}
+</script>

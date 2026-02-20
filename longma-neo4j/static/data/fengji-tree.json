@@ -1,0 +1,338 @@
+{
+  "name": "风力发电机组",
+  "children": [
+    {
+      "name": "变流器",
+      "value": null
+    },
+    {
+      "name": "变桨",
+      "children": [
+        {
+          "name": "导流罩",
+          "value": null
+        },
+        {
+          "name": "减速器",
+          "value": null
+        },
+        {
+          "name": "润滑系统",
+          "value": null
+        },
+        {
+          "name": "轴承",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "齿轮箱弹性支撑",
+      "children": [
+        {
+          "name": "1型六角螺母",
+          "value": null
+        },
+        {
+          "name": "内六角圆柱头螺钉",
+          "value": null
+        },
+        {
+          "name": "平垫圈",
+          "value": null
+        },
+        {
+          "name": "齿轮箱弹性支撑座上部",
+          "value": null
+        },
+        {
+          "name": "齿轮箱弹性支撑座下部",
+          "value": null
+        },
+        {
+          "name": "齿轮箱支座螺栓",
+          "value": null
+        },
+        {
+          "name": "调整垫",
+          "value": null
+        },
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "销轴挡板",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "传动系统",
+      "children": [
+        {
+          "name": "1型六角螺母",
+          "value": null
+        },
+        {
+          "name": "衬套",
+          "value": null
+        },
+        {
+          "name": "电缆环形支架",
+          "value": null
+        },
+        {
+          "name": "轮毂连接螺栓",
+          "value": null
+        },
+        {
+          "name": "平垫圈",
+          "value": null
+        },
+        {
+          "name": "销轴螺栓",
+          "value": null
+        },
+        {
+          "name": "轴承座安装螺栓",
+          "value": null
+        },
+        {
+          "name": "主轴系统",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "传感器支架",
+      "children": [
+        {
+          "name": "1型非金属嵌件六角锁紧螺母",
+          "value": null
+        },
+        {
+          "name": "齿轮箱震动传感器安装支架",
+          "value": null
+        },
+        {
+          "name": "大垫圈",
+          "value": null
+        },
+        {
+          "name": "电缆防缠绕限位开关支架",
+          "value": null
+        },
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "内六角平圆头螺钉",
+          "value": null
+        },
+        {
+          "name": "偏航计数器支架",
+          "value": null
+        },
+        {
+          "name": "平垫圈",
+          "value": null
+        },
+        {
+          "name": "主轴转速传感器支架",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "发电机弹性支撑",
+      "children": [
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "平垫圈",
+          "value": null
+        },
+        {
+          "name": "特制垫圈",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "机舱罩弹性支撑",
+      "children": [
+        {
+          "name": "1型六角螺母",
+          "value": null
+        },
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "特制垫圈",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "机架",
+      "children": [
+        {
+          "name": "塔架",
+          "value": null
+        },
+        {
+          "name": "塔筒",
+          "value": null
+        },
+        {
+          "name": "衬套",
+          "value": null
+        },
+        {
+          "name": "后机架",
+          "value": null
+        },
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "前机架",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "轮毂",
+      "children": [
+        {
+          "name": "1型六角螺母",
+          "value": null
+        },
+        {
+          "name": "变桨齿轮箱",
+          "value": null
+        },
+        {
+          "name": "吊装凸台封板",
+          "value": null
+        },
+        {
+          "name": "盖板",
+          "value": null
+        },
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "轮毂腹板盖板",
+          "value": null
+        },
+        {
+          "name": "平垫圈",
+          "value": null
+        },
+        {
+          "name": "双头螺柱",
+          "value": null
+        },
+        {
+          "name": "销轴螺柱",
+          "value": null
+        },
+        {
+          "name": "走线板",
+          "value": null
+        },
+        {
+          "name": "变桨系统",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "叶片",
+      "children": [
+        {
+          "name": "防雷走线支架",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "液压管路及附件",
+      "children": [
+        {
+          "name": "液压软管",
+          "value": null
+        },
+        {
+          "name": "直通管接头",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "主控系统安装支架",
+      "children": [
+        {
+          "name": "不等边角钢",
+          "value": null
+        },
+        {
+          "name": "底板",
+          "value": null
+        },
+        {
+          "name": "钢板",
+          "value": null
+        },
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "平垫圈",
+          "value": null
+        },
+        {
+          "name": "线槽",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "转子制动器罩壳",
+      "children": [
+        {
+          "name": "六角头螺栓",
+          "value": null
+        },
+        {
+          "name": "平垫圈",
+          "value": null
+        },
+        {
+          "name": "制动器挡板",
+          "value": null
+        }
+      ]
+    },
+    {
+      "name": "机舱",
+      "children": [
+        {
+          "name": "机舱电气总成",
+          "value": null
+        }
+      ]
+    }
+  ]
+}

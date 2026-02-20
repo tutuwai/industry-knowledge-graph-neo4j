@@ -1,0 +1,347 @@
+我的专利知识图谱结构如下：
+实体结点名称和属性：
+├── Patent # 专利
+│   ├── 公开号
+│   ├── 公开日
+│   ├── 名称
+│   ├──摘要
+│   ├──文献类型
+│   ├──申请号
+│   └── 申请日
+├── Agent # 代理机构
+│   └── 名称
+├── Inventor # 发明人
+│   └── 名称
+├── IPC # IPC分类号
+│   └── 名称
+├── Applicant # 申请人
+│   ├── 名称
+│   ├── province
+│   └── 邮编
+实体结点关系和方向：
+(Patent )-[CITES_BY]->(Patent ) #专利被专利引用
+
+(Patent )-[APPLIED_BY]->(Applicant ) #专利被申请人申请
+
+(Patent )-[BELONGS_TO]->(IPC ) #专利属于该IPC分类号
+
+(Patent )-[INVENTED_BY]->(Inventor ) #专利被发明人发明
+
+(Patent )-[REPRESENTED_BY]->(Agent ) #专利被代理人申请
+现在我要写给Neo4jQuery类添加一个查询函数，功能是传入参数(Patent的公开号)，查找与该专利结点相关的所有实体结点和关系
+返回格式规定如下：
+    "results": {
+        "IPC": [],
+        "专利": [],
+        "专利与IPC": [],
+        "专利与专利": [],
+        "专利与代理机构": [],
+        "专利与发明人": [],
+        "专利与申请人": [],
+        "代理机构": [],
+        "发明人": [],
+        "申请人": []
+    },
+这是Neo4jQuery类中可能对你有帮助的部分：
+from py2neo import Graph
+import os
+import json
+from datetime import datetime
+
+
+class Neo4jQuery:
+
+    def __init__(self, url, user, password):
+        self.graph = Graph(url, user=user, password=password, name="neo4j")
+        # 规定返回的格式，请严格遵守
+        self.search_return = {
+            '专利': "RETURN n, id(n)",
+            '代理机构': "RETURN n, id(n)",
+            '发明人': "RETURN n, id(n)",
+            'IPC': "RETURN n, id(n)",
+            '申请人': "RETURN n, id(n)",
+            '专利与专利': "RETURN n.公开号 as from,m.公开号 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与申请人': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与IPC': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与发明人': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与代理机构': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel"
+        }
+        self.search_match = {
+            '专利': "MATCH (n:Patent) ",
+            '代理机构': "MATCH (n:Agent) ",
+            '发明人': "MATCH (n:Inventor) ",
+            'IPC': "MATCH (n:IPC) ",
+            '申请人': "MATCH (n:Applicant) ",
+            '专利与专利': "MATCH p = (n:Patent)-[r]->(m:Patent) ",
+            '专利与申请人': "MATCH p = (n:Patent)-[r]->(m:Applicant) ",
+            '专利与IPC': "MATCH p = (n:Patent)-[r]->(m:IPC) ",
+            '专利与发明人': "MATCH p = (n:Patent)-[r]->(m:Inventor) ",
+            '专利与代理机构': "MATCH p = (n:Patent)-[r]->(m:Agent) "
+        }
+        self.search_label = {
+            '专利': "Patent",
+            '代理机构': "Agent",
+            '发明人': "Inventor",
+            'IPC': "IPC",
+            '申请人': "Applicant"
+        }
+
+         '''查找实体'''
+    '''功能:根据pageRankScore阈值筛选实体,筛选出高于该值的实体'''
+    '''
+    参数:
+        "label": "实体类型"
+        "score_threshold"="得分值",
+    返回:
+        成功:返回查询结果的数组
+        失败:返回Flase
+    '''
+
+    def search_entities(self, label=None, score_threshold=None):
+        if label is None or score_threshold is None:
+            return False
+
+        query = f"{self.search_match[label]}WHERE n.pageRankScore >= {score_threshold} {self.search_return[label]}"
+        print(query)
+
+        try:
+            nodes = self.graph.run(query)
+            result = []
+            for node in nodes:
+                properties = dict(node["n"])
+                properties["type"] = label
+                properties["id"] = node["id(n)"]
+                result.append(properties)
+            return result
+        except Exception as e:
+            print(f"查询失败: {e}")
+            return False
+
+    '''查找关系'''
+    '''功能:根据关系两端的pageRankScore阈值筛选关系,筛选出高于该值的关系'''
+    '''
+    参数:
+        "rel_type": "关系类型"
+        "property_key"="关系属性名称",
+        "from_score_threshold"="值"
+        "to_score_threshold"="值"
+    返回:
+        查询结果的数组
+    '''
+
+    def search_relationships(self, rel_type=None, from_score_threshold=None, to_score_threshold=None):
+        if rel_type is None or from_score_threshold is None or to_score_threshold is None:
+            return False
+
+        query = f"{self.search_match[rel_type]}WHERE n.pageRankScore >= {from_score_threshold} AND m.pageRankScore >= {to_score_threshold} {self.search_return[rel_type]}"
+        print(query)
+
+        try:
+            relationships = self.graph.run(query)
+            result = []
+            for rel in relationships:
+                properties = dict(rel)
+                properties["from_type"] = rel_type.split('与')[0]
+                properties["to_type"] = rel_type.split('与')[1]
+                result.append(properties)
+            return result
+        except Exception as e:
+            print(f"查询失败: {e}")
+            return False
+
+         # 宏观接口查询
+    def get_filtered_data(self, score_patent, score_agent, score_inventor, score_ipc, score_applicant):
+        result = {}
+        # 查询各种实体
+        result['专利'] = self.search_entities('专利', score_patent)
+        result['代理机构'] = self.search_entities('代理机构', score_agent)
+        result['发明人'] = self.search_entities('发明人', score_inventor)
+        result['IPC'] = self.search_entities('IPC', score_ipc)
+        result['申请人'] = self.search_entities('申请人', score_applicant)
+
+        # 查询各种关系
+        result['专利与专利'] = self.search_relationships('专利与专利', score_patent, score_patent)
+        result['专利与申请人'] = self.search_relationships('专利与申请人', score_patent, score_applicant)
+        result['专利与IPC'] = self.search_relationships('专利与IPC', score_patent, score_ipc)
+        result['专利与发明人'] = self.search_relationships('专利与发明人', score_patent, score_inventor)
+        result['专利与代理机构'] = self.search_relationships('专利与代理机构', score_patent, score_agent)
+
+        return {
+            "status": "success",
+            "message": "数据查询成功",
+            "results": result
+        }
+
+
+
+现在我想让你用到刚刚写的函数去帮我写一个接口，以下是你app.py中可能用到的内容，请参考一下返回格式
+
+from flask import Flask, request, jsonify
+from flask.views import MethodView
+from flask_cors import CORS
+from neo4j.export_data import Neo4jQuery  # 确保导入正确
+from datetime import datetime
+# 创建 Elasticsearch 索引类的实例
+from mysql_to_elasticsearch import ESCreateIndex
+
+app = Flask(__name__)
+CORS(app)  # 简化跨域处理初始化
+
+# 数据库的基础配置
+url = 'http://localhost:7474/browser/'
+user = 'neo4j'
+password = 'CHW123d456'
+
+es = ESCreateIndex("patent")
+
+# 宏观展示界面的查询接口
+# app.py
+@app.route('/datas', methods=['GET'])
+def get_data():
+    try:
+        # 从请求参数中获取分数阈值
+        score_patent = float(request.args.get('score_patent', 0))
+        score_agent = float(request.args.get('score_agent', 0))
+        score_inventor = float(request.args.get('score_inventor', 0))
+        score_ipc = float(request.args.get('score_ipc', 0))
+        score_applicant = float(request.args.get('score_applicant', 0))
+
+        # 创建 Neo4jQuery 实例
+        query_instance = Neo4jQuery(url, user, password)
+
+        # 调用 get_filtered_data 方法获取数据
+        data = query_instance.get_filtered_data(score_patent, score_agent, score_inventor, score_ipc, score_applicant)
+
+        # 返回 JSON 格式的查询结果
+        return jsonify(data)
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        })
+
+
+
+现在要增加一个小的查询函数
+根据公开号查询被引次数
+一个文件叫neo4j/data/index/关系-专利和专利-处理前.csv
+内容如下，可以查询到专利的被引情况，请返回被引用次数
+公开号,被引用公开号,关系
+CN101225743A,CN102562091A,被引�?
+CN101225743A,CN102619533A,被引�?
+CN101225743A,CN102678135A,被引�?
+CN101225743A,CN103195447A,被引�?
+CN101225743A,CN103527212A,被引�?
+
+
+我的专利知识图谱结构如下：
+实体结点名称和属性：
+├── Patent # 专利
+│   ├── 公开号
+│   ├── 公开日
+│   ├── 名称
+│   ├──摘要
+│   ├──文献类型
+│   ├──申请号
+│   └── 申请日
+├── Agent # 代理机构
+│   └── 名称
+├── Inventor # 发明人
+│   └── 名称
+├── IPC # IPC分类号
+│   └── 名称
+├── Applicant # 申请人
+│   ├── 名称
+│   ├── province
+│   └── 邮编
+实体结点关系和方向：
+(Patent )-[CITES_BY]->(Patent ) #专利被专利引用
+
+(Patent )-[APPLIED_BY]->(Applicant ) #专利被申请人申请
+
+(Patent )-[BELONGS_TO]->(IPC ) #专利属于该IPC分类号
+
+(Patent )-[INVENTED_BY]->(Inventor ) #专利被发明人发明
+
+(Patent )-[REPRESENTED_BY]->(Agent ) #专利被代理人申请
+现在我要写给Neo4jQuery类再添加一个查询函数，功能是传入参数(Patent的公开号)，查找与该专利结点同类型IPC专利的数量，
+注意一个专利可能属于多个IPC，IPC下又有很多相关专利，请给我单独给出函数和测试函数不用像上次
+我的专利知识图谱结构如下：
+实体结点名称和属性：
+├── Patent # 专利
+│   ├── 公开号
+│   ├── 公开日
+│   ├── 名称
+│   ├──摘要
+│   ├──文献类型
+│   ├──申请号
+│   └── 申请日
+├── Agent # 代理机构
+│   └── 名称
+├── Inventor # 发明人
+│   └── 名称
+├── IPC # IPC分类号
+│   └── 名称
+├── Applicant # 申请人
+│   ├── 名称
+│   ├── province
+│   └── 邮编
+实体结点关系和方向：
+(Patent )-[CITES_BY]->(Patent ) #专利被专利引用
+
+(Patent )-[APPLIED_BY]->(Applicant ) #专利被申请人申请
+
+(Patent )-[BELONGS_TO]->(IPC ) #专利属于该IPC分类号
+
+(Patent )-[INVENTED_BY]->(Inventor ) #专利被发明人发明
+
+(Patent )-[REPRESENTED_BY]->(Agent ) #专利被代理人申请
+现在我要写给Neo4jQuery类再添加一个查询函数，功能是输入的结点结点类型是申请人，IPC和发明人和代理机构名称时，
+根据输入对象的名称查询他们的相关专利，并将结果以年份列成表像这样的表
+专利名称 专利年份(公开日的时间格式是YYYY.MM.DD但这里只要YYYY)  专利重要度
+查询他们相关的专利
+
+from py2neo import Graph
+import os
+import json
+from datetime import datetime
+import csv
+
+
+class Neo4jQuery:
+
+    def __init__(self, url, user, password):
+        self.graph = Graph(url, user=user, password=password, name="neo4j")
+        # 规定返回的格式
+        self.search_return = {
+            '专利': "RETURN n, id(n)",
+            '代理机构': "RETURN n, id(n)",
+            '发明人': "RETURN n, id(n)",
+            'IPC': "RETURN n, id(n)",
+            '申请人': "RETURN n, id(n)",
+            '专利与专利': "RETURN n.公开号 as from,m.公开号 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与申请人': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与IPC': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与发明人': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel",
+            '专利与代理机构': "RETURN n.公开号 as from,m.名称 as to,id(n) as id_from,id(m) as id_to,type(r) as rel"
+        }
+        self.search_match = {
+            '专利': "MATCH (n:Patent) ",
+            '代理机构': "MATCH (n:Agent) ",
+            '发明人': "MATCH (n:Inventor) ",
+            'IPC': "MATCH (n:IPC) ",
+            '申请人': "MATCH (n:Applicant) ",
+            '专利与专利': "MATCH p = (n:Patent)-[r]->(m:Patent) ",
+            '专利与申请人': "MATCH p = (n:Patent)-[r]->(m:Applicant) ",
+            '专利与IPC': "MATCH p = (n:Patent)-[r]->(m:IPC) ",
+            '专利与发明人': "MATCH p = (n:Patent)-[r]->(m:Inventor) ",
+            '专利与代理机构': "MATCH p = (n:Patent)-[r]->(m:Agent) "
+        }
+        self.search_label = {
+            '专利': "Patent",
+            '代理机构': "Agent",
+            '发明人': "Inventor",
+            'IPC': "IPC",
+            '申请人': "Applicant"
+        }

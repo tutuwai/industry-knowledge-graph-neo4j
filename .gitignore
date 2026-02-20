@@ -1,0 +1,59 @@
+# ====== OS / Editor ======
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+.idea/
+.vscode/
+*.iml
+*.suo
+*.user
+*.swp
+*.swo
+
+# ====== Logs ======
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ====== Python ======
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# ====== Django ======
+db.sqlite3
+media/
+staticfiles/
+
+# ====== Node ======
+**/node_modules/
+**/dist/
+**/.cache/
+**/.turbo/
+
+# ====== Env / Secrets ======
+.env
+.env.*
+!.env.example
+
+# ====== Archives / Large temp files ======
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+
+# ====== Project-specific (optional template) ======
+前端/vben/vue-vben-admin/node_modules/
+前端/vben/vue-vben-admin/dist/
+前端/vben/vue-vben-admin/

@@ -1,0 +1,345 @@
+现在我要在我的前端应用这个接口组件，将api=http://127.0.3.1:5001/search/patent_details?publication_number=公众号传入组件
+src/components/PatentDetailPage/ForceGraph_Graph.vue中，现在我给你一个之前用这个组件的示例，我希望你也能保持类似的风格
+这个示例中父组件是src/views/GraphPage.vue子组件是src/components/GraphPage/ForceGraph_Graph.vue，
+父组件相关代码如下：
+<template>
+  <!--图谱可视化区域-->
+  <svg>
+    <force-graph v-if="displayMode === 'normal'" :url="api1" v-on:clickNode="showNodeInfo" :thresholds="thresholds"
+                 @update-statistics="handleStatisticsUpdate"/>
+  </svg>
+</template>
+ <script>
+import ForceGraph from "../components/GraphPage/ForceGraph_Graph.vue";
+import moment from "moment";
+
+let bool_input = false;
+export default {
+  name: "HomePage",
+  components: {ForceGraph, DatePicker, ForceGraph_pagerank},
+  data() {
+    return {
+      api1: "http://127.0.3.1:5001/datas?score_patent=5.8&score_agent=6&score_inventor=5&score_ipc=40&score_applicant=5",
+      ...
+          handleInputSubmit(inputString) {
+      if (inputString != "") bool_input = true;
+      else bool_input = false;
+      this.search_input = inputString;
+      if (bool_input == true) {
+        const params = {
+          search_input: this.search_input,
+        };
+        const queryString = Object.keys(params)
+            .map((key) => params[key])
+            .join("&");
+        this.api1 = "http://127.0.3.1:5050/datas/community?name=" + queryString;
+        console.log("new_api1=", this.api1);
+      }
+    },
+子组代码如下
+<template>
+  <svg width="1000" height="550" id="svg1"></svg>
+</template>
+
+<script>
+import {watchEffect, onMounted, onUnmounted} from "vue";
+import * as d3 from 'd3';
+import axios from "axios";
+
+export default {
+  name: 'ForceGraph',
+  props: {
+    url: {
+      type: String,
+      required: true
+    },
+    thresholds: {
+      type: Object,
+      required: true
+    },
+  },
+
+  data() {
+    return {
+      nodes: [],
+      links: [],
+      colors: ['#6aabd1', '#fdae61', '#e76f51'
+        , '#38dac1', '#f53064'],
+      link_colors: ['#cd2626', '#63aa40', '#0021ff', '#d13ebb'
+        , '#f6038c', '#e1d70d', '#1bcc61'],//线的颜色
+      statistics: {
+        专利: 0,
+        代理机构: 0,
+        发明人: 0,
+        IPC: 0,
+        申请人: 0,
+        专利与专利: 0,
+        专利与IPC: 0,
+        专利与发明人: 0,
+        专利与代理机构: 0
+      },
+    }
+  },
+  mounted() {
+    onMounted(() => {
+      this.initGraph();
+    });
+    watchEffect(() => {
+      if (this.url) {
+        this.loadData();
+      }
+    });
+现在我要应用到的父组件src/views/PatentDetailPage.vue如下：
+<template>
+  <div class="patent-detail-page">
+    <div class="graph-area">
+      <h2>图谱区</h2>
+      <!-- 图谱显示区 -->
+    </div>
+    <div class="node-info">
+      <h2>结点信息区</h2>
+      <!-- 结点基本信息显示区 -->
+    </div>
+    <div class="value-statistics">
+      <h2>价值统计</h2>
+      <!-- 雷达图显示区 -->
+    </div>
+    <div class="line-chart">
+      <h2>折线图</h2>
+      <!-- 折线图显示区 -->
+    </div>
+    <div class="pie-chart">
+      <h2>圆饼图</h2>
+      <!-- 圆饼图显示区 -->
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'PatentDetailPage',
+  data() {
+    return {
+      publicationNumber: this.$route.params.publicationNumber,
+      // 更多专利信息的状态数据
+    };
+  },
+  mounted() {
+    this.fetchPatentDetails();
+  },
+  methods: {
+    fetchPatentDetails() {
+      // 使用 this.publicationNumber 从API获取专利详细信息
+    }
+  }
+}
+</script>
+这个父组件是由跳转链接     <h3><a :href="`#/patent/${result.公开号}`" target="_blank"生成的链接
+我希望去用公开号生成url=http://127.0.3.1:5001/search/patent_details?publication_number=公开号
+然后传到src/components/PatentDetailPage/ForceGraph_Graph.vue中请告诉要怎么做更改那些地方
+
+
+现在我要增加一个点击结点，显示结点信息的功能，先给你一个示范，
+这是父组件相关的代码：
+<template>
+  <!--图谱可视化区域-->
+  <svg>
+    <force-graph v-if="displayMode === 'normal'" :url="api1" v-on:clickNode="showNodeInfo" :thresholds="thresholds"
+                 @update-statistics="handleStatisticsUpdate"/>
+
+    <ForceGraph_pagerank v-if="displayMode === 'importance'" :url="api1" v-on:clickNode="showNodeInfo" :thresholds="thresholds"
+                         @update-statistics="handleStatisticsUpdate"/>
+  </svg>
+
+  <!--每个结点的信息-->
+  <div class="node_info" v-html="selectedNode ? selectedNodeInfo : ''"></div>
+
+</template>
+
+<script>
+    nodeStatistics: [],
+ methods: {
+    //更新结点状态信息
+    handleStatisticsUpdate(statistics) {
+      this.nodeStatistics = statistics;
+      //console.log("ABCDE:", this.nodeStatistics);
+    },
+     //展示结点信息
+    showNodeInfo(node) {
+      if (!node) {
+        return;
+      }
+      this.selectedNode = node;
+      //console.log('clicked node:', node);
+    },
+  },
+  computed: {
+    selectedNodeInfo() {
+      const node = this.selectedNode;
+      if (!node) {
+        return '';
+      }
+
+      // 定义一个对象来映射结点类型
+      const nodeTypes = {
+        0: '专利',
+        1: '代理机构',
+        2: '发明人',
+        3: 'IPC分类号',
+        4: '申请人'
+      };
+
+      let info = `<div>结点ID: ${node.id}</div>`;
+      info += `<div>结点类型: ${nodeTypes[node.group]}</div>`;  // 添加显示结点类型的行
+      // 直接获取结点的 pageRankScore 属性
+      info += `<div>结点重要度: ${node.pageRankScore}</div>`; // 显示结点的重要度得分
+      switch (node.group) {
+        case 0:  // 专利
+          info += `
+        <div>名称: ${node.名称}</div>
+        <div>公开号: ${node.公开号}</div>
+        <div>公开日: ${node.公开日}</div>
+        <div>摘要: ${node.摘要}</div>
+        <div>文献类型: ${node.文献类型}</div>
+        <div>申请号: ${node.申请号}</div>
+        <div>申请日: ${node.申请日}</div>`;
+          break;
+        case 1:  // 代理机构
+          info += `<div>名称: ${node.名称}</div>`;
+          break;
+        case 2:  // 发明人
+          info += `<div>名称: ${node.名称}</div>`;
+          break;
+        case 3:  // IPC分类号
+          info += `<div>名称: ${node.名称}</div>`;
+          break;
+        case 4:  // 申请人
+          info += `
+        <div>名称: ${node.名称}</div>
+        <div>邮编: ${node.邮编}</div>`;
+          break;
+      }
+      return info;
+    }
+    ,
+</script>
+子组件
+      // 添加节点点击事件监听器
+      node.on('click', (d) => {
+        this.$emit('clickNode', d); // 触发父组件的showNodeInfo方法
+      });
+      // 添加节点点击事件监听器
+      text.on('click', (d) => {
+        this.$emit('clickNode', d); // 触发父组件的showNodeInfo方法
+      });
+    },
+而我现在要在结点信息区添加结点的状态要怎么照搬修改
+<template>
+  <div class="patent-detail-page">
+    <div class="graph-area">
+      <!-- 图谱显示区 -->
+      <force-graph-graph :url="apiUrl"></force-graph-graph>
+    </div>
+    <div class="node-info">
+      <h2>结点信息区</h2>
+      <!-- 结点基本信息显示区 -->
+    </div>
+    <div class="value-statistics">
+      <h2>价值统计</h2>
+      <!-- 雷达图显示区 -->
+    </div>
+    <div class="line-chart">
+      <h2>折线图</h2>
+      <!-- 折线图显示区 -->
+    </div>
+    <div class="pie-chart">
+      <h2>圆饼图</h2>
+      <!-- 圆饼图显示区 -->
+    </div>
+  </div>
+</template>
+
+<script>
+import ForceGraphGraph from '../components/PatentDetailPage/ForceGraph_Graph.vue';
+
+export default {
+  name: 'PatentDetailPage',
+  components: {
+    ForceGraphGraph
+  },
+  data() {
+    return {
+      publicationNumber: this.$route.params.publicationNumber,  // 从路由获取公开号
+    };
+  },
+  computed: {
+    apiUrl() {
+      return `http://127.0.3.1:5001/search/patent_details?publication_number=${this.publicationNumber}`;
+    }
+  },
+  mounted() {
+    this.fetchPatentDetails();
+  },
+  methods: {
+    fetchPatentDetails() {
+      // 使用 this.publicationNumber 从API获取专利详细信息
+    }
+  }
+}
+</script>
+
+<style scoped>
+.patent-detail-page {
+  display: grid;
+  grid-template-columns: 5fr 2fr; /* 2/3 和 1/3 的宽度分配 */
+  grid-template-rows: repeat(5, 1fr); /* 分为5行，以便按比例分配 */
+  gap: 30px; /* 增大间隙以清楚分隔不同区域 */
+  padding: 20px;
+  height: 100vh; /* 整个视口的高度 */
+  background-color: #f0f0f0; /* 整体背景色，略淡，易于区分 */
+}
+
+.graph-area, .node-info, .value-statistics, .line-chart, .pie-chart {
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ccc; /* 增加边框 */
+}
+
+.graph-area {
+  grid-column: 1 / 2;
+  grid-row: 1 / 4; /* 占据前4行 1~4*/
+  background-color: #ffffff; /* 白色背景 */
+  overflow: hidden; /* 防止内容溢出 */
+  position: relative; /* 设置相对定位，为子元素定位提供参考 */
+}
+
+/* 可能需要调整的 CSS，确保 SVG 完全填充 graph-area */
+.graph-area svg {
+  width: 100%;
+  height: 100%;
+}
+
+.node-info {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2; /* 占据第一行的2/3高度 */
+  background-color: #aaaaf1; /* 淡蓝色背景 */
+}
+
+.value-statistics {
+  grid-column: 2 / 3;
+  grid-row: 2 / 4; /* 占据第一行的1/3高度 */
+  background-color: #b9f6b9; /* 淡绿色背景 */
+}
+
+.line-chart {
+  grid-column: 1 / 2;
+  grid-row: 4 / 6; /* 占据第三行 */
+  background-color: #fee; /* 淡粉色背景 */
+}
+
+.pie-chart {
+  grid-column: 2 / 3;
+  grid-row: 4 / 6; /* 占据第三行 */
+  background-color: #eeefff; /* 淡紫色背景 */
+}
+</style>

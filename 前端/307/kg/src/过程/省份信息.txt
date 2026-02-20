@@ -1,0 +1,509 @@
+{
+  "message": "数据查询成功",
+  "results": {
+    "applicant": {
+      "上海":[],
+      "云南": [
+        {
+          "name": "中国国家铁路集团有限公司",
+          "value": 121.265322922393
+        }
+      ],
+      "内蒙古": [],
+      "北京": [
+        {
+          "name": "中国铁道科学研究院集团有限公司",
+          "value": 119.753458732569
+        }
+      ],
+      "台湾": [],
+      "吉林": [],
+      "四川": [
+        {
+          "name": "西南交通大学",
+          "value": 483.283158015664
+        }
+      ],
+      "宁夏": [],
+      "安徽": [],
+      "山东": [
+      ],
+      "广西": [],
+      "新疆": [],
+
+      "重庆": [],
+      "陕西": [
+        {
+          "name": "北京交通大学",
+          "value": 57.7660479688654
+        }
+      ],
+      "青海": [
+        {
+          "name": "重庆大学",
+          "value": 54.7307500822369
+        }
+      ],
+      "香港": [],
+      "黑龙江": []
+    },
+    "inventor":{},
+    "ipc": {},
+    "patent": {
+      "上海": [
+        {
+          "name": "电力隧道智能灭火机器人",
+          "value": 16.0157500062552
+        },
+        {
+          "name": "具有集成能源供给、存储设备和混合控制系统的五重效果发电多循环混合可再生能源系统\n具有集成能源供給、存儲設備和混合控制系統的五重效果發電多循環混合可再生能源系統",
+          "value": 12.2508423524611
+        },
+        {
+          "name": "一种非侵入式电流测量方法、装置、存储介质以及程序产品",
+          "value": 10.7475089140161
+        },
+        {
+          "name": "用于UICC和终端之间安全信道化的技术\nＵＩＣＣ及终端间氨全频道技术\nUICC及终端间安全频道技术;TECHNIQUES FOR SECURE CHANNELIZATION BETWEEN UICC AND A TERMINAL",
+          "value": 9.2172451540822
+        }
+      ],
+      "云南": [],
+      "内蒙古": [],
+      "北京": [
+        {
+          "name": "隧道远程智能应急风机",
+          "value": 9.47908254584476
+        },
+        {
+          "name": "用于UICC和终端之间安全信道化的技术\nＵＩＣＣ及终端间氨全频道技术\nUICC及终端间安全频道技术;TECHNIQUES FOR SECURE CHANNELIZATION BETWEEN UICC AND A TERMINAL",
+          "value": 9.2172451540822
+        },
+        {
+          "name": "隧道车辆智能调度指挥系统",
+          "value": 9.13522736295356
+        }
+      ],
+      "台湾": [],
+      "吉林": [],
+      "四川": [
+        {
+          "name": "一种非侵入式电流测量方法、装置、存储介质以及程序产品",
+          "value": 10.7475089140161
+        },
+        {
+          "name": "一种多场景电能计量数据传输系统及方法",
+          "value": 9.45265075273199
+        },
+        {
+          "name": "高铁融媒体播控方法、系统、设备和高铁播放设备",
+          "value": 9.09801295076962
+        }
+      ],
+      "天津": [
+        {
+          "name": "电力隧道智能灭火机器人",
+          "value": 16.0157500062552
+        }
+      ],
+      "宁夏": [],
+      "安徽": [],
+      "山东": [
+        {
+          "name": "用于UICC和终端之间安全信道化的技术\nＵＩＣＣ及终端间氨全频道技术\nUICC及终端间安全频道技术;TECHNIQUES FOR SECURE CHANNELIZATION BETWEEN UICC AND A TERMINAL",
+          "value": 9.2172451540822
+        }
+      ],
+      "山西": [
+        {
+          "name": "高铁融媒体播控方法、系统、设备和高铁播放设备",
+          "value": 9.09801295076962
+        }
+      ],
+      "广东": [
+        {
+          "name": "价值链网络控制塔和企业管理平台",
+          "value": 10.4002488469466
+        }
+      ],
+      "广西": [],
+      "新疆": [],
+      "江苏": [
+        {
+          "name": "隧道远程智能应急风机",
+          "value": 9.47908254584476
+        },
+        {
+          "name": "隧道车辆智能调度指挥系统",
+          "value": 9.13522736295356
+        }
+      ],
+      "江西": [
+        {
+          "name": "一种隧道施工安全监控方法和系统",
+          "value": 10.0932602724961
+        },
+        {
+          "name": "一种基于科技智能的隧道安全健康评定、监测系统",
+          "value": 10.012609554202
+        }
+      ],
+      "河北": [],
+      "河南": [
+        {
+          "name": "一种带电锤和吸尘装置的隧道环保施工智能系统",
+          "value": 10.293348459204
+        },
+        {
+          "name": "一种电缆隧道智能在线监测系统",
+          "value": 10.2830404605911
+        },
+        {
+          "name": "印花胶料及智能吸湿透气面料、制备方法和服装",
+          "value": 9.01084941199401
+        }
+      ],
+      "浙江": [
+        {
+          "name": "高铁融媒体播控方法、系统、设备和高铁播放设备",
+          "value": 9.09801295076962
+        }
+      ],
+      "海南": [],
+      "湖北": [],
+      "湖南": [],
+      "澳门": [],
+      "甘肃": [],
+      "福建": [
+        {
+          "name": "一种隧道照明智能监控装置、系统",
+          "value": 9.13030627910266
+        }
+      ],
+      "西藏": [],
+      "贵州": [],
+      "辽宁": [],
+      "重庆": [
+        {
+          "name": "一种隧道照明智能监控装置、系统",
+          "value": 9.13030627910266
+        },
+        {
+          "name": "一种利用红外技术测量车流量和车速的装置及方法",
+          "value": 9.05483820924316
+        }
+      ],
+      "陕西": [],
+      "青海": [],
+      "香港": [],
+      "黑龙江": []
+    }
+  },
+  "status": "success"
+}
+以上是我http://127.0.3.1:5001/datas/location_summary?time=2024-01-01请求到的数据格式现在我想在我的图标展示当中把原来的
+产业链地理信息换成专利的地理信息
+<template>
+  <div>
+    <china-map :api="api" :api_company="api_company" :type="selectedType"/>
+  </div>
+  <!-- 复选框 -->
+  <div class="selections">
+    <el-checkbox v-model="up" label="专利" size="large"/>
+    <el-checkbox v-model="mid" label="申请人" size="large"/>
+    <el-checkbox v-model="down" label="发明人" size="large"/>
+  </div>
+  <!-- 时间范围输入查询 -->
+  <div class="in_date">
+    <date-picker v-model="dateRange" @update:value="handleDatepickerChange"/>
+  </div>
+  <!-- 新增：下拉框选择展示类型 -->
+  <div class="display_type">
+    <el-select v-model="selectedType" placeholder="请选择">
+      <el-option label="重要度" value="重要度"></el-option>
+      <el-option label="专利数量" value="专利数量"></el-option>
+    </el-select>
+  </div>
+  <!-- 新增：生成图标按钮 -->
+  <div class="generate_button">
+    <el-button type="primary" @click="updateGraph">更新地图</el-button>
+  </div>
+</template>
+<script>
+import ChinaMap from "@/components/ChinaMap.vue";
+import DatePicker from "../components/DatePicker.vue";
+import moment from "moment";
+
+export default {
+  name: "FourthPage",
+  components: {ChinaMap, DatePicker},
+  data() {
+    return {
+      api: "",
+      api_company: "",
+      dateRange: [],
+      start_time: "1990-10-10",
+      end_time: "2023-4-10",
+      selectedType: "专利数量",
+    };
+  },
+  methods: {
+    handleDatepickerChange(value) {
+      this.end_time = moment(value).format("YYYY-MM-DD");
+    },
+    // 更新图表方法
+    updateGraph() {
+      // 简化 API，只使用时间参数
+      this.api = `http://127.0.3.1:5001/datas/location?time=${this.end_time}`;
+      this.api_company = `http://127.0.3.1:5001/datas?link=false&product=true&company=true&start_time=${this.start_time}&end_time=${this.end_time}`;
+
+      console.log("Updated API URL:", this.api);
+      console.log("Updated Company API URL:", this.api_company);
+    },
+  },
+  mounted() {
+    this.updateGraph();
+  },
+}
+</script>
+以上是src/views/MapPage.vue的逻辑代码我想把api_company替换成http://127.0.3.1:5001/datas/location_summary?time=2024-01-01
+<template>
+  <div class="echarts-map-china" ref="echarts-map-china"></div>
+
+  <div class="echarts-pie">
+    <PieChart :data="options.pieChartData" :title="Pietitle"/>
+  </div>
+  <div class="analysis">
+    <BarChart :data="options.stackedLineChartData" :title="Linetitle"></BarChart>
+  </div>
+</template>
+<script>
+import "../utils/china"
+import * as echarts from 'echarts';
+import axios from 'axios';
+import BarChart from "../components/BarChart.vue";
+import PieChart from "../components/PieChart.vue";
+
+export default {
+  components: {BarChart, PieChart},
+  props: {
+    api: {
+      type: String,
+      required: true,
+    },
+    api_company: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      api1: "",
+      myEcharts: null,
+      options: {
+        title: {
+          text: '专利地图分布',
+          x: "center",
+          textStyle: {
+            fontSize: 19,
+            color: "black"
+          },
+        },
+        tooltip: {
+          trigger: 'item',
+          backgroundColor: "white",
+          formatter: ''
+        },
+        visualMap: {
+          top: '55%',
+          left: '6%',
+          min: 0,
+          max: 50,
+          text: ['High', 'Low'],
+          realtime: true,
+          calculable: true,
+          inRange: {
+            color: ['#dfebff', '#012bfb']
+          }
+        },
+        series: [
+          {
+            name: '模拟数据',
+            type: 'map',
+            mapType: 'china',
+            roam: true,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true,
+                  textStyle: {
+                    color: "black"
+                  }
+                }
+              },
+              zoom: 1.5,
+              emphasis: {
+                label: {show: true}
+              }
+            },
+            top: "5%",
+            data: []
+          }
+        ],
+        pieChartData: [],  // 初始化为一个空数组
+        Linetitle: "",
+        Pietitle: "",
+        stackedLineChartData: [],  // 初始化为一个空数组
+        companyData: [],  // 初始化为一个空数组
+        relationData: [],  // 初始化为一个空数组
+        productData: [],  // 初始化为一个空数组
+      }
+    };
+  },
+
+  mounted() {
+    this.myEcharts = echarts.init(this.$refs["echarts-map-china"]);
+    this.updateOptions();
+    this.loadData();
+    // 监听地图点击事件
+    this.myEcharts.on('click', this.handleMapClick);
+  },
+  watch: {
+    api: {
+      handler: function () {
+        this.loadData();
+      },
+      deep: true,
+    },
+    api_company: {  // 新增对 api_company 的观察
+      handler: function () {
+        this.loadCompanyData();
+      },
+      deep: true,
+    },
+    type: {
+      handler: function () {
+        this.updateOptions();
+        this.loadData();
+        this.loadCompanyData();
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    updateOptions() {
+      this.options.tooltip.formatter = `地区：{b}<br/>${this.type}：{c}`;
+    },
+    // 修改 handleMapClick 方法
+    handleMapClick(params) {
+      //更新饼图数据
+      let provinceName = params.name;
+      this.Pietitle = params.name + "省专利资本占比";
+      let companiesInProvince = this.companyData.filter(company => company.地区.includes(provinceName));
+      this.options.pieChartData = companiesInProvince.map(company => {
+        let productsOfCompany = this.relationData.filter(relation => relation.from === company.name);
+        return {
+          name: company.name,
+          value: productsOfCompany.reduce((total, product) => total + company.注册资本万元 * product.weight, 0),
+        };
+      });
+      //更新柱状图数据
+      this.Linetitle = params.name + "省专利产品构成";
+      let productsInProvince = companiesInProvince.reduce((products, company) => {
+        let productsOfCompany = this.relationData.filter(relation => relation.from === company.name).map(relation => {
+          let product = this.productData.find(p => p.name === relation.to);
+          return product ? {
+            name: product.name,
+            type: product.type,
+            value: company.注册资本万元 * relation.weight,
+          } : null;
+        }).filter(product => product);  // 去除 null 值
+        return products.concat(productsOfCompany);
+      }, []);
+
+      let groupedData = {};
+      productsInProvince.forEach(product => {
+        if (!groupedData[product.name]) {
+          groupedData[product.name] = {'专利': 0, '申请人': 0, '发明人': 0};
+        }
+        if (product.type === 1) {
+          groupedData[product.name]['专利'] += product.value;
+        } else if (product.type === 2) {
+          groupedData[product.name]['申请人'] += product.value;
+        } else if (product.type === 3) {
+          groupedData[product.name]['发明人'] += product.value;
+        }
+      });
+
+      this.options.stackedLineChartData = Object.entries(groupedData).map(([productName, typeSums]) => {
+        return {
+          name: productName,
+          专利: typeSums['专利'],
+          申请人: typeSums['申请人'],
+          发明人: typeSums['发明人']
+        };
+      });
+
+      console.log(this.options.stackedLineChartData)
+
+    },
+    loadData() {
+      return axios.get(this.api).then(response => {
+        if (response.data.status === 'success') {
+          const data = response.data.results[this.type]; // 确保 'this.type' 正确指向 '专利数量' 或 '重要度'
+          console.log(this.type, data);
+          const maxValue = Math.max(...data.map(item => item.value));
+          this.options.visualMap.max = maxValue; // 根据最大值调整 visualMap
+          this.options.series[0].data = data.map(item => ({name: item.name, value: item.value}));
+          this.myEcharts.setOption(this.options);
+        } else {
+          console.error('数据请求失败:', response.data.message);
+        }
+      }).catch(error => {
+        console.error('请求错误:', error);
+      });
+    },
+    // 修改 loadCompanyData 方法
+    loadCompanyData() {
+      return axios.get(this.api_company).then(response => {
+        if (response.data.status === 'success') {
+          this.companyData = response.data.results.公司.map(company => {
+            return {
+              name: company.name,
+              地区: company.所属地区,
+              注册资本万元: company.注册资本万元,
+            };
+          });
+          this.productData = response.data.results.产品.map(product => {
+            let type = product.up ? 1 : product.mid ? 2 : product.down ? 3 : 0;
+            return {
+              name: product.name,
+              type: type,
+            };
+          });
+          this.relationData = response.data.results.公司与产品.map(relation => {
+            return {
+              from: relation.from,
+              to: relation.to,
+              weight: relation.weight,
+            };
+          });
+          console.log('公司数据:', this.companyData);
+          console.log('产品数据:', this.productData);
+          console.log('关系数据:', this.relationData);
+        } else {
+          console.error('公司数据请求失败');
+        }
+      }).catch(error => {
+        console.error(error);
+      });
+    },
+  }
+};
+</script>
+但是他们的逻辑有不同数据读取又不一样，我希望applicant，inventor，patent的数据传入BarChart，而ipc传入PieChart，希望产生的交互就是点击地图的一个省份
+显示相应省份的数据信息
